@@ -50,6 +50,12 @@ translation. [Node.JS](http://nodejs.org/) is a framework for running JavaScript
 on a server instead of in a browser, and will allow us to write a server
 application that coordinates the clients and connects the services.
 
+Node.JS Tutorials and Docs
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* [A few Hello World examples](http://howtonode.org/hello-node)
+* [Node.JS API Docs](http://nodejs.org/api/)(Pretty Cryptic)
+
 Installing Node.JS
 ~~~~~~~~~~~~~~~~~~
 
