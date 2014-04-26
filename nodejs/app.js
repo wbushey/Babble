@@ -5,7 +5,11 @@ var Router = require('node-simple-router');
 // Configure the Router
 var router = new Router();
 router.get("/", function(request, response){
-  response.end("Hello World\n");
+  if ("name" in request.get){
+    response.end("Hello " + request.get.name + "\n");
+  } else {
+    response.end("Hello World\n");
+  }
 });
 router.get("/foo", function(request, response){
   response.end("Bar\n");
