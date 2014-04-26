@@ -10,12 +10,15 @@ Speech to Text
   * Free
   * Only Chrome has support
   * [Demo](https://www.google.com/intl/en/chrome/demos/speech.html)
+  * [Introduction](http://updates.html5rocks.com/2013/01/Voice-Driven-Web-Apps-Introduction-to-the-Web-Speech-API)
 
 Translation Services
 ====================
 
 * Bing
   * Free up to 2 million characters
+  * [End User Site](http://www.bing.com/translator)
+  * [Using the API](https://www.microsoft.com/web/post/using-the-free-bing-translation-apis)
 * Google Translate
   * $20 per 1 million characters
 
