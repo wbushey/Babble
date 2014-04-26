@@ -56,6 +56,11 @@ Node.JS Tutorials and Docs
 * [A few Hello World examples](http://howtonode.org/hello-node)
 * [Node.JS API Docs](http://nodejs.org/api/)(Pretty Cryptic)
 
+Node.JS Libraries
+-----------------
+
+* [node-simple-router](https://www.npmjs.org/package/node-simple-router)
+
 Installing Node.JS
 ------------------
 
