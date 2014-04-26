@@ -12,7 +12,7 @@ router.get("/", function(request, response){
   }
 });
 router.get("/foo", function(request, response){
-  response.end("Bar\n");
+  response.end(request.url + "bar\n");
 });
 
 
