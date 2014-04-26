@@ -1,11 +1,19 @@
 // Load the http module
 var http = require('http');
+var Router = require('node-simple-router');
 
-// Configure the HTTP server
-var server = http.createServer(function (request, response){
-  response.writeHead(200, {"Content-Type": "text/plain"});
+// Configure the Router
+var router = new Router();
+router.get("/", function(request, response){
   response.end("Hello World\n");
 });
+router.get("/foo", function(request, response){
+  response.end("Bar\n");
+});
+
+
+// Configure the HTTP server
+var server = http.createServer(router);
 
 server.listen(8888);
 
