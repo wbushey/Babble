@@ -9,7 +9,7 @@ Speech to Text
 * Google Web Speech API
   * Free
   * Only Chrome has support
-  * [Demo](https://http://23.235.12.35/Babble/webspeechdemo/)
+  * [Demo](http://23.235.12.35/Babble/webspeechdemo/)
   * [Introduction](http://updates.html5rocks.com/2013/01/Voice-Driven-Web-Apps-Introduction-to-the-Web-Speech-API)
 
 Translation Services
