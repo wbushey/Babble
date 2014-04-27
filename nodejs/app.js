@@ -27,6 +27,9 @@ router.get("/mic-slash.gif", function(request, response){
 router.get("/assets/style.css", function(request, response){
   response.end(fs.readFileSync('assets/style.css'));
 });
+router.get("/assets/languages.js", function(request, response){
+  response.end(fs.readFileSync('assets/languages.js'));
+});
 
 
 /*
