@@ -280,32 +280,25 @@ if (!('webkitSpeechRecognition' in window)) {
 
       var list = langs[select_language.selectedIndex];
       var languageFrom = list[1][0].substring(0,2);
-      var languageTo = 'es';   // Translate to Spanish for now.
+      //var languageTo = 'es';   // Translate to Spanish for now.
+      var languageTo = 'en';
+      console.log(languageFrom);
 
-/*
-      var DatamarketAccessUri = "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13";
-      var client_id = 'redwingbabble';
-      var client_secret = 'redhotsecretredhotsecret';
-      var scope_ = 'http://api.microsofttranslator.com/';
-      var grant_type = 'client_credentials';
-      var params = 'grant_type=client_credentials&client_id=' +
-                   client_id + '&client_secret=' + 
-                   encodeURIComponent(client_secret) +
-                   '&scope=' + encodeURIComponent(scope_);
-      // console.log(DatamarketAccessUri + "?" + params);
-      var xmlhttp = new XMLHttpRequest();
-      xmlhttp.open("POST", DatamarketAccessUri, true);
-      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-
-      xmlhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
-      xmlhttp.setRequestHeader("Access-Control-Allow-Headers", 
-                               "origin, x-requested-with, content-type");
-      xmlhttp.setRequestHeader("Access-Control-Allow-Methods", 
-                               "PUT, GET, POST, DELETE, OPTIONS");
-      xmlhttp.send(params);
-*/
-      jQuery.post("/requestTranslateToken", function(data){
-        alert(data);
+      jQuery.get("/requestTranslateToken", function(data){
+        // Now do stuff with this!
+        alert("languageTo:" + languageTo);
+	var translation_data = {
+          appId: decodeURIComponent(data.access_token),
+          text: final_transcript,
+          from: languageFrom,
+          to: languageTo,
+          contentType: "text/plain"
+        };
+        //console.log(translation_data);
+        jQuery.post("/translateText", translation_data, function(response_data){
+            alert(response_data);
+          });
+        
       });
 
      // range.selectNode(document.getElementById('final_span'));
