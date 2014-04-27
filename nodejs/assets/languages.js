@@ -162,7 +162,12 @@ if (!('webkitSpeechRecognition' in window)) {
         jQuery.get("/translateText", translation_data, function(response_data){
          console.log(response_data);
          jQuery("#translated_text").html(response_data);
-          });
+        });
+
+        jQuery.get("/translateAudio", translation_data, function(response_data){
+         console.log(response_data);
+         jQuery("#translated_audio").html(response_data);
+        });
         
       });
 
