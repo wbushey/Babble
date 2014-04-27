@@ -150,7 +150,7 @@ if (!('webkitSpeechRecognition' in window)) {
 
       jQuery.get("/requestTranslateToken", function(data){
         // Now do stuff with this!
-	var translation_data = {
+	    var translation_data = {
           appId: data.access_token,
           text: final_transcript,
           from: languageFrom,
@@ -159,7 +159,8 @@ if (!('webkitSpeechRecognition' in window)) {
         };
         //console.log(translation_data);
         jQuery.get("/translateText", translation_data, function(response_data){
-         jQuery("#translated_text").innerHTML(response_data);
+         console.log(response_data);
+         jQuery("#translated_text").html(response_data);
           });
         
       });

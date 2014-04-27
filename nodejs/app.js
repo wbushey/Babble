@@ -71,7 +71,7 @@ router.get("/requestTranslateToken", function(request, response){
 
 
 router.get("/translateText", function(request, response){
-  response.setHeader("Content-Type", "application/json");
+  //response.setHeader("Content-Type", "application/json");
 
   var options = {
     host: 'api.microsofttranslator.com',
