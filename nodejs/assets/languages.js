@@ -143,9 +143,10 @@ if (!('webkitSpeechRecognition' in window)) {
      // Put our translation code here!!!! 
 
       var list = langs[select_language.selectedIndex];
-      var languageFrom = list[1][0].substring(0,2);
-      var languageTo = 'es';   // Translate to Spanish for now.
-      //var languageTo = 'en';
+      // var languageFrom = list[1][0].substring(0,2);
+      var languageFrom = language_codes[select_language.selectedIndex];
+      // var languageTo = 'es';   // Translate to Spanish for now.
+      var languageTo = language_codes[to_language.selectedIndex];
       console.log(languageFrom);
 
       jQuery.get("/requestTranslateToken", function(data){
