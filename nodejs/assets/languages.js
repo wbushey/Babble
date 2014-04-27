@@ -162,6 +162,7 @@ if (!('webkitSpeechRecognition' in window)) {
         jQuery.get("/translateText", translation_data, function(response_data){
          console.log(response_data);
          jQuery("#translated_text").html(response_data);
+         translation_data['text'] = jQuery("#translated_text string").html();
          audio_params = jQuery.param(translation_data);
          jQuery("#translated_audio").html('<audio src="/translateAudio?' + audio_params + '" controls autoplay></audio>');
         });
