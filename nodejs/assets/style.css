@@ -75,4 +75,12 @@
     background-color:transparent;
     padding: 0;
   }
+  #translated_text{
 
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d8d8d8;
+  margin-bottom: 1.25rem;
+  padding: 1.25rem;
+  background: #f2f2f2;
+  }
