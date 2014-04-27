@@ -1,6 +1,6 @@
-var languages = ["Afrikaans", "Bahasa Indonesia", "Bahasa Melayu", "Català", "Čeština", "Deutsch", "English", "Español", "Euskara", "Français", "Galego", "Hrvatski", "IsiZulu", "Íslenska", "Italiano", "Magyar", "Nederlands", "Norsk bokmål", "Polski", "Português", "Română", "Slovenčina", "Suomi", "Svenska", "Türkçe", "български", "Pусский", "Српски", "한국어", "中文", "日本語", "Lingua latīna"];
+var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese Simplified', 'Chinese Traditional', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hmong Daw', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Klingon', 'Klingon (pIqaD)', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Maltese', 'Norwegian', 'Persian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese', 'Welsh'];
 
-var language_codes = ["af", "id", "ms", "ca", "cs", "de", "en", "es", "eu", "fr", "gl", "hr", "zu", "is", "it", "hu", "nl", "nb", "pl", "pt", "ro", "sk", "fi", "sv", "tr", "bg", "ru", "sr", "ko", "cm", "ja", "la"];
+var languages_codes = ['ar', 'bg', 'ca', 'zh-CHS', 'zh-CHT', 'cs', 'da', 'nl', 'en', 'et', 'fi', 'fr', 'de', 'el', 'ht', 'he', 'hi', 'mww', 'hu', 'id', 'it', 'ja', 'tlh', 'tlh-Qaak', 'ko', 'lv', 'lt', 'ms', 'mt', 'no', 'fa', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'es', 'sv', 'th', 'tr', 'uk', 'ur', 'vi', 'cy'];
 
 var langs =
 [['Afrikaans',       ['af-ZA']],
