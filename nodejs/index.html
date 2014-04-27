@@ -124,12 +124,6 @@
     </div>
   </div>
   <div class="sidebyside">
-    <button id="email_button" class="button" onclick="emailButton()">
-      Create Email</button>
-    <div id="email_info" class="info">
-      Text sent to default email application.<br>
-      (See chrome://settings/handlers to change.)
-    </div>
   </div>
   <p>
   <div id="div_language">
@@ -137,6 +131,7 @@
     &nbsp;&nbsp;
     <select id="select_dialect"></select>
   </div>
+  <div id="translated_text"></div>
 </div>
 <script>
 var langs =
@@ -280,23 +275,22 @@ if (!('webkitSpeechRecognition' in window)) {
 
       var list = langs[select_language.selectedIndex];
       var languageFrom = list[1][0].substring(0,2);
-      //var languageTo = 'es';   // Translate to Spanish for now.
-      var languageTo = 'en';
+      var languageTo = 'es';   // Translate to Spanish for now.
+      //var languageTo = 'en';
       console.log(languageFrom);
 
       jQuery.get("/requestTranslateToken", function(data){
         // Now do stuff with this!
-        alert("languageTo:" + languageTo);
 	var translation_data = {
-          appId: decodeURIComponent(data.access_token),
+          appId: data.access_token,
           text: final_transcript,
           from: languageFrom,
           to: languageTo,
           contentType: "text/plain"
         };
         //console.log(translation_data);
-        jQuery.post("/translateText", translation_data, function(response_data){
-            alert(response_data);
+        jQuery.get("/translateText", translation_data, function(response_data){
+         jQuery("#translated_text").innerHTML(response_data);
           });
         
       });
@@ -373,7 +367,6 @@ function emailButton() {
     createEmail();
   }
   email_button.style.display = 'none';
-  email_info.style.display = 'inline-block';
   showInfo('');
 }
 
@@ -414,9 +407,7 @@ function showButtons(style) {
   }
   current_style = style;
   copy_button.style.display = style;
-  email_button.style.display = style;
   copy_info.style.display = 'none';
-  email_info.style.display = 'none';
 }
 </script>
 </body>

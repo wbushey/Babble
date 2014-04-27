@@ -63,13 +63,13 @@ router.get("/requestTranslateToken", function(request, response){
 });
 
 
-router.post("/translateText", function(request, response){
+router.get("/translateText", function(request, response){
   response.setHeader("Content-Type", "application/json");
 
   var options = {
     host: 'api.microsofttranslator.com',
     port: 80,
-    path: '/V2/Http.svc/Translate',
+    path: '/V2/Http.svc/Translate?to=' + request.get.to + '&from=' + request.get.from + '&text=' + encodeURIComponent(request.get.text),
     method: "GET"
   };
 
@@ -88,15 +88,17 @@ router.post("/translateText", function(request, response){
   });
   var post_data = querystring.stringify({
       //'appId': "Bearer " + request.post.appId,
-      'text': request.post.text,
-      'from': request.post.from,
-      'to': encodeURIComponent(request.post.to),
+      'text': request.get.text,
+      'from': request.get.from,
+      'to': encodeURIComponent(request.get.to),
       'contentType': "text/plain"
   });
   console.log("Post_data created");
   console.log(post_data);
-  post_req.setHeader('Authorization', "Bearer " + request.post.appId);
+  post_req.setHeader('Authorization', "Bearer " + request.get.appId);
   post_req.write(post_data);
+  console.log('post_req = ');;
+  console.log(post_req);
   post_req.end();
 
 });
