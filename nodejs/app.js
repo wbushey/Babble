@@ -124,7 +124,10 @@ router.get("/translateAudio", function(request, response){
   var post_req = http.request(options, function(external_response){
     external_response.on('data', function(chunk){
       console.log(chunk);
-      response.end(chunk);
+      response.write(chunk);
+    });
+    external_response.on('end', function(chunk){
+      response.end();
     });
     external_response.on('error', function(e){
       console.log("Got error: " + e.message);
