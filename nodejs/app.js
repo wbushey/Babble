@@ -112,18 +112,19 @@ router.get("/translateText", function(request, response){
 
 router.get("/translateAudio", function(request, response){
   //response.setHeader("Content-Type", "application/json");
+  response.setHeader("Content-Type", "audio/mpeg");
 
   var options = {
     host: 'api.microsofttranslator.com',
     port: 80,
-    path: '/V2/Http.svc/Speak?language=' + request.get.to + '&text=' + encodeURIComponent(request.get.text) + '&options=MaxQuality',
+    path: '/V2/Http.svc/Speak?language=' + request.get.to + '&text=' + encodeURIComponent(request.get.text) + '&format=audio%2Fmp3&options=MaxQuality',
     method: "GET"
   };
 
   var post_req = http.request(options, function(external_response){
     external_response.on('data', function(chunk){
-      console.log(chunk.toString());
-      response.end(chunk.toString());
+      console.log(chunk);
+      response.end(chunk);
     });
     external_response.on('error', function(e){
       console.log("Got error: " + e.message);
