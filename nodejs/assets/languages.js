@@ -227,8 +227,6 @@ function copyButton() {
     recognizing = false;
     recognition.stop();
   }
-  copy_button.style.display = 'none';
-  copy_info.style.display = 'inline-block';
   showInfo('');
 }
 
