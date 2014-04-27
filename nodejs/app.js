@@ -10,6 +10,11 @@ var router = new Router();
 router.get("/", function(request, response){
   response.end(fs.readFileSync('index.html'));
 });
+
+/*
+ * Serve Resources
+ * Surely there must be a more general way to do this
+ */
 router.get("/mic-animate.gif", function(request, response){
   response.end(fs.readFileSync('pics/mic-animate.gif'));
 });
@@ -19,15 +24,14 @@ router.get("/mic.gif", function(request, response){
 router.get("/mic-slash.gif", function(request, response){
   response.end(fs.readFileSync('pics/mic-slash.gif'));
 });
-
-
-router.get("/foo", function(request, response){
-  response.end(request.url + "bar\n");
+router.get("/assets/style.css", function(request, response){
+  response.end(fs.readFileSync('assets/style.css'));
 });
 
 
-
-
+/*
+ * Services
+ */
 router.get("/requestTranslateToken", function(request, response){
   response.setHeader("Content-Type", "application/json");
 
