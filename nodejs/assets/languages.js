@@ -68,6 +68,7 @@ var langs =
 
 for (var i = 0; i < langs.length; i++) {
   select_language.options[i] = new Option(langs[i][0], i);
+  to_language.options[i] = new Option(langs[i][0], i);
 }
 select_language.selectedIndex = 6;
 updateCountry();
