@@ -1,9 +1,9 @@
-var languages = ["Afrikaans", "Bahasa Indonesia", "Bahasa Melayu", "Català", "Čeština", "Deutsch", "English", "Español", "Euskara", "Français", "Galego", "Hrvatski", "IsiZulu", "Íslenska", "Italiano", "Magyar", "Nederlands", "Norsk bokmål", "Polski", "Português", "Română", "Slovenčina", "Suomi", "Svenska", "Türkçe", "български", "Pусский", "Српски", "한국어", "中文", "日本語", "Lingua latīna"];
-
-var language_codes = ["af", "id", "ms", "ca", "cs", "de", "en", "es", "eu", "fr", "gl", "hr", "zu", "is", "it", "hu", "nl", "nb", "pl", "pt", "ro", "sk", "fi", "sv", "tr", "bg", "ru", "sr", "ko", "cm", "ja", "la"];
-
-var langs =
-[['Afrikaans',       ['af-ZA']],
+var language_codes = ['id', 'ms', 'ca', 'cs', 'de', 'en',
+    'es', 'fr', 'it', 'hu', 'nl', 'no', 'pl', 'pt', 'ro',
+    'sk', 'fi', 'sv', 'tr', 'bg', 'ru', 'ko', 'zh-CHS', 'ja']
+    
+var langs = [
+// ['Afrikaans',       ['af-ZA']],
  ['Bahasa Indonesia',['id-ID']],
  ['Bahasa Melayu',   ['ms-MY']],
  ['Català',          ['ca-ES']],
@@ -36,12 +36,12 @@ var langs =
                      ['es-DO', 'República Dominicana'],
                      ['es-UY', 'Uruguay'],
                      ['es-VE', 'Venezuela']],
- ['Euskara',         ['eu-ES']],
+ // ['Euskara',         ['eu-ES']],
  ['Français',        ['fr-FR']],
- ['Galego',          ['gl-ES']],
- ['Hrvatski',        ['hr_HR']],
- ['IsiZulu',         ['zu-ZA']],
- ['Íslenska',        ['is-IS']],
+ // ['Galego',          ['gl-ES']],
+ // ['Hrvatski',        ['hr_HR']],
+ // ['IsiZulu',         ['zu-ZA']],
+ // ['Íslenska',        ['is-IS']],
  ['Italiano',        ['it-IT', 'Italia'],
                      ['it-CH', 'Svizzera']],
  ['Magyar',          ['hu-HU']],
@@ -57,19 +57,21 @@ var langs =
  ['Türkçe',          ['tr-TR']],
  ['български',       ['bg-BG']],
  ['Pусский',         ['ru-RU']],
- ['Српски',          ['sr-RS']],
+ // ['Српски',          ['sr-RS']],
  ['한국어',            ['ko-KR']],
  ['中文',             ['cmn-Hans-CN', '普通话 (中国大陆)'],
                      ['cmn-Hans-HK', '普通话 (香港)'],
                      ['cmn-Hant-TW', '中文 (台灣)'],
                      ['yue-Hant-HK', '粵語 (香港)']],
  ['日本語',           ['ja-JP']],
- ['Lingua latīna',   ['la']]];
+ // ['Lingua latīna',   ['la']]
+ ];
 
 for (var i = 0; i < langs.length; i++) {
   select_language.options[i] = new Option(langs[i][0], i);
   to_language.options[i] = new Option(langs[i][0], i);
 }
+
 select_language.selectedIndex = 6;
 updateCountry();
 select_dialect.selectedIndex = 6;
@@ -279,5 +281,5 @@ function showButtons(style) {
   }
   current_style = style;
   copy_button.style.display = style;
-  copy_info.style.display = 'none';
+  // copy_info.style.display = 'none';
 }
