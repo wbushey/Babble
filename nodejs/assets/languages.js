@@ -1,9 +1,18 @@
+<<<<<<< HEAD
 var languages = ['Arabic', 'Bulgarian', 'Catalan', 'Chinese Simplified', 'Chinese Traditional', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Finnish', 'French', 'German', 'Greek', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hmong Daw', 'Hungarian', 'Indonesian', 'Italian', 'Japanese', 'Klingon', 'Klingon (pIqaD)', 'Korean', 'Latvian', 'Lithuanian', 'Malay', 'Maltese', 'Norwegian', 'Persian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Slovak', 'Slovenian', 'Spanish', 'Swedish', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese', 'Welsh'];
 
 var language_codes = ['ar', 'bg', 'ca', 'zh-CHS', 'zh-CHT', 'cs', 'da', 'nl', 'en', 'et', 'fi', 'fr', 'de', 'el', 'ht', 'he', 'hi', 'mww', 'hu', 'id', 'it', 'ja', 'tlh', 'tlh-Qaak', 'ko', 'lv', 'lt', 'ms', 'mt', 'no', 'fa', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'es', 'sv', 'th', 'tr', 'uk', 'ur', 'vi', 'cy'];
 
 var langs =
 [['Afrikaans',       ['af-ZA']],
+=======
+var language_codes = ['id', 'ms', 'ca', 'cs', 'de', 'en',
+    'es', 'fr', 'it', 'hu', 'nl', 'no', 'pl', 'pt', 'ro',
+    'sk', 'fi', 'sv', 'tr', 'bg', 'ru', 'ko', 'zh-CHS', 'ja']
+    
+var langs = [
+// ['Afrikaans',       ['af-ZA']],
+>>>>>>> autosend
  ['Bahasa Indonesia',['id-ID']],
  ['Bahasa Melayu',   ['ms-MY']],
  ['Català',          ['ca-ES']],
@@ -36,12 +45,12 @@ var langs =
                      ['es-DO', 'República Dominicana'],
                      ['es-UY', 'Uruguay'],
                      ['es-VE', 'Venezuela']],
- ['Euskara',         ['eu-ES']],
+ // ['Euskara',         ['eu-ES']],
  ['Français',        ['fr-FR']],
- ['Galego',          ['gl-ES']],
- ['Hrvatski',        ['hr_HR']],
- ['IsiZulu',         ['zu-ZA']],
- ['Íslenska',        ['is-IS']],
+ // ['Galego',          ['gl-ES']],
+ // ['Hrvatski',        ['hr_HR']],
+ // ['IsiZulu',         ['zu-ZA']],
+ // ['Íslenska',        ['is-IS']],
  ['Italiano',        ['it-IT', 'Italia'],
                      ['it-CH', 'Svizzera']],
  ['Magyar',          ['hu-HU']],
@@ -57,23 +66,28 @@ var langs =
  ['Türkçe',          ['tr-TR']],
  ['български',       ['bg-BG']],
  ['Pусский',         ['ru-RU']],
- ['Српски',          ['sr-RS']],
+ // ['Српски',          ['sr-RS']],
  ['한국어',            ['ko-KR']],
  ['中文',             ['cmn-Hans-CN', '普通话 (中国大陆)'],
                      ['cmn-Hans-HK', '普通话 (香港)'],
                      ['cmn-Hant-TW', '中文 (台灣)'],
                      ['yue-Hant-HK', '粵語 (香港)']],
  ['日本語',           ['ja-JP']],
- ['Lingua latīna',   ['la']]];
+ // ['Lingua latīna',   ['la']]
+ ];
+
+var timeOut = 0;
 
 for (var i = 0; i < langs.length; i++) {
   select_language.options[i] = new Option(langs[i][0], i);
   to_language.options[i] = new Option(langs[i][0], i);
 }
-select_language.selectedIndex = 6;
+
+select_language.selectedIndex = 5;
 updateCountry();
 select_dialect.selectedIndex = 6;
 showInfo('info_start');
+to_language.selectedIndex = 6;
 
 function updateCountry() {
   for (var i = select_dialect.options.length - 1; i >= 0; i--) {
@@ -127,6 +141,7 @@ if (!('webkitSpeechRecognition' in window)) {
   };
 
   recognition.onend = function() {
+    window.clearTimeout(timeOut);
     recognizing = false;
     if (ignore_onend) {
       return;
@@ -162,22 +177,22 @@ if (!('webkitSpeechRecognition' in window)) {
         jQuery.get("/translateText", translation_data, function(response_data){
          console.log(response_data);
          jQuery("#translated_text").html(response_data);
+         translation_data['text'] = jQuery("#translated_text string").html();
+         audio_params = jQuery.param(translation_data);
+         jQuery("#translated_audio").html('<audio src="/translateAudio?' + audio_params + '" controls autoplay></audio>');
+         setTimeout(startButton(event), 3000);
         });
 
-        jQuery.get("/translateAudio", translation_data, function(response_data){
-         console.log(response_data);
-         jQuery("#translated_audio").html(response_data);
-        });
-        
       });
 
      // range.selectNode(document.getElementById('final_span'));
       window.getSelection().addRange(range);
     }
-    if (create_email) {
-      create_email = false;
-      createEmail();
-    }
+//    if (create_email) {
+//      create_email = false;
+//      createEmail();
+//    }
+    
   };
 
   recognition.onresult = function(event) {
@@ -195,6 +210,10 @@ if (!('webkitSpeechRecognition' in window)) {
     if (final_transcript || interim_transcript) {
       showButtons('inline-block');
     }
+    if (timeOut != 0) {
+       window.clearTimeout(timeOut)
+    }
+    timeOut = window.setTimeout(copyButton, 3000);
   };
 }
 
@@ -214,23 +233,23 @@ function capitalize(s) {
   return s.replace(first_char, function(m) { return m.toUpperCase(); });
 }
 
-function createEmail() {
-  var n = final_transcript.indexOf('\n');
-  if (n < 0 || n >= 80) {
-    n = 40 + final_transcript.substring(40).indexOf(' ');
-  }
-  var subject = encodeURI(final_transcript.substring(0, n));
-  var body = encodeURI(final_transcript.substring(n + 1));
-  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
-}
+// function createEmail() {
+//  var n = final_transcript.indexOf('\n');
+//  if (n < 0 || n >= 80) {
+//    n = 40 + final_transcript.substring(40).indexOf(' ');
+//  }
+//  var subject = encodeURI(final_transcript.substring(0, n));
+//  var body = encodeURI(final_transcript.substring(n + 1));
+//  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+//}
 
 function copyButton() {
   if (recognizing) {
     recognizing = false;
     recognition.stop();
+    // window.setTimeout(startButton, 1000);
   }
-  copy_button.style.display = 'none';
-  copy_info.style.display = 'inline-block';
+  
   showInfo('');
 }
 
@@ -283,5 +302,5 @@ function showButtons(style) {
   }
   current_style = style;
   copy_button.style.display = style;
-  copy_info.style.display = 'none';
+  // copy_info.style.display = 'none';
 }
