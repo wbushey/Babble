@@ -78,6 +78,7 @@ select_language.selectedIndex = 5;
 updateCountry();
 select_dialect.selectedIndex = 6;
 showInfo('info_start');
+to_language.selectedIndex = 6;
 
 function updateCountry() {
   for (var i = select_dialect.options.length - 1; i >= 0; i--) {
