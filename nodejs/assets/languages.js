@@ -67,12 +67,14 @@ var langs = [
  // ['Lingua latīna',   ['la']]
  ];
 
+var timeOut = 0;
+
 for (var i = 0; i < langs.length; i++) {
   select_language.options[i] = new Option(langs[i][0], i);
   to_language.options[i] = new Option(langs[i][0], i);
 }
 
-select_language.selectedIndex = 6;
+select_language.selectedIndex = 5;
 updateCountry();
 select_dialect.selectedIndex = 6;
 showInfo('info_start');
@@ -129,6 +131,7 @@ if (!('webkitSpeechRecognition' in window)) {
   };
 
   recognition.onend = function() {
+    window.clearTimeout(timeOut);
     recognizing = false;
     if (ignore_onend) {
       return;
@@ -167,6 +170,7 @@ if (!('webkitSpeechRecognition' in window)) {
          translation_data['text'] = jQuery("#translated_text string").html();
          audio_params = jQuery.param(translation_data);
          jQuery("#translated_audio").html('<audio src="/translateAudio?' + audio_params + '" controls autoplay></audio>');
+         setTimeout(startButton(event), 3000);
         });
 
       });
@@ -174,10 +178,11 @@ if (!('webkitSpeechRecognition' in window)) {
      // range.selectNode(document.getElementById('final_span'));
       window.getSelection().addRange(range);
     }
-    if (create_email) {
-      create_email = false;
-      createEmail();
-    }
+//    if (create_email) {
+//      create_email = false;
+//      createEmail();
+//    }
+    
   };
 
   recognition.onresult = function(event) {
@@ -195,6 +200,10 @@ if (!('webkitSpeechRecognition' in window)) {
     if (final_transcript || interim_transcript) {
       showButtons('inline-block');
     }
+    if (timeOut != 0) {
+       window.clearTimeout(timeOut)
+    }
+    timeOut = window.setTimeout(copyButton, 3000);
   };
 }
 
@@ -214,21 +223,23 @@ function capitalize(s) {
   return s.replace(first_char, function(m) { return m.toUpperCase(); });
 }
 
-function createEmail() {
-  var n = final_transcript.indexOf('\n');
-  if (n < 0 || n >= 80) {
-    n = 40 + final_transcript.substring(40).indexOf(' ');
-  }
-  var subject = encodeURI(final_transcript.substring(0, n));
-  var body = encodeURI(final_transcript.substring(n + 1));
-  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
-}
+// function createEmail() {
+//  var n = final_transcript.indexOf('\n');
+//  if (n < 0 || n >= 80) {
+//    n = 40 + final_transcript.substring(40).indexOf(' ');
+//  }
+//  var subject = encodeURI(final_transcript.substring(0, n));
+//  var body = encodeURI(final_transcript.substring(n + 1));
+//  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+//}
 
 function copyButton() {
   if (recognizing) {
     recognizing = false;
     recognition.stop();
+    // window.setTimeout(startButton, 1000);
   }
+  
   showInfo('');
 }
 
