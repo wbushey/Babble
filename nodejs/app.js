@@ -9,6 +9,11 @@ var secret = require('./secret');
 // Configure the Router
 var router = new Router({static_route: __dirname + "/assets"});
 
+var home = require('./home');
+var requestTranslateToken = require('./requestTranslateToken');
+var translateText = require('./translateText');
+var translateAudio = require('./translateAudio');
+
 router.get("/", function(request, response){
   response.end(fs.readFileSync('index.html'));
 });
