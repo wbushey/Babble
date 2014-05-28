@@ -6,29 +6,10 @@ var querystring = require('querystring');
 var fs = require('fs');
 
 // Configure the Router
-var router = new Router();
+var router = new Router({static_route: __dirname + "/assets"});
+
 router.get("/", function(request, response){
   response.end(fs.readFileSync('index.html'));
-});
-
-/*
- * Serve Resources
- * Surely there must be a more general way to do this
- */
-router.get("/mic-animate.gif", function(request, response){
-  response.end(fs.readFileSync('pics/mic-animate.gif'));
-});
-router.get("/mic.gif", function(request, response){
-  response.end(fs.readFileSync('pics/mic.gif'));
-});
-router.get("/mic-slash.gif", function(request, response){
-  response.end(fs.readFileSync('pics/mic-slash.gif'));
-});
-router.get("/assets/style.css", function(request, response){
-  response.end(fs.readFileSync('assets/style.css'));
-});
-router.get("/assets/languages.js", function(request, response){
-  response.end(fs.readFileSync('assets/languages.js'));
 });
 
 
