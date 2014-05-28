@@ -4,6 +4,7 @@ var https = require('https');
 var Router = require('node-simple-router');
 var querystring = require('querystring');
 var fs = require('fs');
+var secret = require('./secret');
 
 // Configure the Router
 var router = new Router({static_route: __dirname + "/assets"});
@@ -41,8 +42,8 @@ router.get("/requestTranslateToken", function(request, response){
   });
   console.log("Post_req created");
   var post_data = querystring.stringify({
-      'client_id': 'redwingbabble',
-      'client_secret': 'redhotsecretredhotsecret',
+      'client_id': secret.client_id,
+      'client_secret': secret.client_secret,
       'scope': 'http://api.microsofttranslator.com/',
       'grant_type': 'client_credentials'
   });
