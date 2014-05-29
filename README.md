@@ -3,6 +3,24 @@ Babble
 
 A realtime audio/text translation prototype
 
+Giants
+======
+
+* [Node.js](http://nodejs.org/)
+* [Socket.io](http://socket.io/)
+
+
+Install and Run
+===============
+
+Debian/Ubuntu
+--------------
+
+    apt-get install nodejs
+    cd nodejs
+    npm install
+    node app.js
+
 Speech to Text
 ==============
 
@@ -67,3 +85,19 @@ Installing Node.JS
 Node.JS is already installed on our Ignite server. In case we need to install
 it again, or you want to install it on your own computer, [here are 
 instructions on how to install Node.JS on a variety of platforms](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager).
+
+
+Socket.io
+=========
+
+Babble will use [Socket.io](http://socket.io/) to allow multiple users to 
+connect to a single server and talk to each other across languages. This 
+functionality, it turns out, is very similar to a simple chatroom 
+client/server. Fortunately for us, Socket.io provides an [example chatroom
+server/client](http://chat.socket.io/), with 
+[source code](https://github.com/Automattic/socket.io/tree/master/examples/chat),
+that guide our development.
+
+* [Socket.io Docs](http://socket.io/docs/)
+* [Server API](http://socket.io/docs/server-api/)
+* [Client API](http://socket.io/docs/client-api/)
