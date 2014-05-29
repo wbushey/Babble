@@ -101,3 +101,17 @@ that guide our development.
 * [Socket.io Docs](http://socket.io/docs/)
 * [Server API](http://socket.io/docs/server-api/)
 * [Client API](http://socket.io/docs/client-api/)
+
+Testing
+=======
+
+Tuts+ has a [great article](http://code.tutsplus.com/tutorials/testing-in-nodejs--net-35018)
+on using [Mocha](http://visionmedia.github.io/mocha/) and [Chai](http://chaijs.com/)
+for testing in Node.js, as well as general Test Driven Development in Node.js.
+
+[Travis-CI](https://travis-ci.org/) provides contineous integration. Awesome.
+
+Install Test Requirements
+-------------------------
+
+    npm install mocha chai
