@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/wbushey/Babble.svg)](https://travis-ci.org/wbushey/Babble)
+
 Babble
 ======
 
