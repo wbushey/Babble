@@ -11,6 +11,7 @@ before_script:
 script: mocha
 branches:
   only:
+    - master
     - testing
 env:
   - secure: "VyEbXocAcJMBNIOCH5p0iGbZ6eP3p0V4YjpHthOZz+xF9rhqTl8cxH0HMxY3vabySqcbHpwAV5th66RD2pgaoMTWCrV1oXeKFtzJC5lgEdbBQcP2eIIsYnaIgC6rIlTcFAE74QnFLzxtEeEXV3In8Cwv0F2vU/TMP7GboYxjhaQ="
