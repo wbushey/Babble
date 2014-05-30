@@ -121,3 +121,17 @@ Install Test Requirements
 
     npm install -g mocha
     npm install chai
+
+Secrets
+=======
+
+In order to allow both developers and Travis-CI to access needed secret keys,
+the utils/getSecrets module was created that contains the
+getSecret(secret_name) function. This function will return the value of
+secret_name from either a secret.js file found in the utils folder, or from
+environmental variables if Babble is running on Travis-CI.
+
+Example of using getSecrets:
+
+    var secerts = require('utils/getSecrets');
+    var our_little_secret = secerts.getSecret('our_little_secret');
