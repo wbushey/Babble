@@ -116,4 +116,5 @@ for testing in Node.js, as well as general Test Driven Development in Node.js.
 Install Test Requirements
 -------------------------
 
-    npm install mocha chai
+    npm install -g mocha
+    npm install chai
