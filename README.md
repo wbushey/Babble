@@ -141,3 +141,8 @@ Example of using getSecrets:
 
     var secerts = require('utils/getSecrets');
     var our_little_secret = secerts.getSecret('our_little_secret');
+
+How to add secrets for Travis-CI
+--------------------------------
+
+See these [instructions](http://docs.travis-ci.com/user/encryption-keys/).
