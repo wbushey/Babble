@@ -16,7 +16,7 @@ Install and Run
 Debian/Ubuntu
 --------------
 
-    apt-get install nodejs
+    apt-get install nodejs npm
     cd nodejs
     npm install
     node app.js
