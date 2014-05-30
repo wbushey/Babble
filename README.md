@@ -122,6 +122,12 @@ Install Test Requirements
     npm install -g mocha
     npm install chai
 
+Run Tests
+---------
+
+    cd nodejs
+    mocha
+
 Secrets
 =======
 
