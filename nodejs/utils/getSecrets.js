@@ -9,7 +9,7 @@ exports.getSecret = function(secret_name){
   if (process.env.TRAVIS){
     val = process.env[secret_name];
   } else {
-    var secrets = require('./secret.js');
+    var secrets = require('../secret.js');
     val = secrets[secret_name];
   }
   return val;
