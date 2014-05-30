@@ -111,6 +111,9 @@ Tuts+ has a [great article](http://code.tutsplus.com/tutorials/testing-in-nodejs
 on using [Mocha](http://visionmedia.github.io/mocha/) and [Chai](http://chaijs.com/)
 for testing in Node.js, as well as general Test Driven Development in Node.js.
 
+And [here's an article](http://liamkaufman.com/blog/2012/01/28/testing-socketio-with-mocha-should-and-socketio-client/)
+on testing the client side of Socket.io.
+
 [Travis-CI](https://travis-ci.org/) provides contineous integration. Awesome.
 
 Install Test Requirements
