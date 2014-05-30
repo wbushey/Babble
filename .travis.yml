@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+  - "0.11"
+  - "0.10"
+  - "0.8"
+  - "0.6"
+before_install: "cd nodejs"
+before_script:
+  - npm install -g mocha
+  - npm install chai
+script: mocha
+branches:
+  only:
+    - testing
+env:
+  - secure: "VyEbXocAcJMBNIOCH5p0iGbZ6eP3p0V4YjpHthOZz+xF9rhqTl8cxH0HMxY3vabySqcbHpwAV5th66RD2pgaoMTWCrV1oXeKFtzJC5lgEdbBQcP2eIIsYnaIgC6rIlTcFAE74QnFLzxtEeEXV3In8Cwv0F2vU/TMP7GboYxjhaQ="
+  - secure: "IydLhfexPGqeJOPqhiMs6UftcE/+MWyBhHtn2oennOWoeqqmpW6ZPrxAKWMaBuhm3ExojKOEdQBkey98/CM77hYTKfGUn9zvScpJb6DTRsxl6r1lMuOW1qxSDnAkezrYf416ZMAdcyMdIXjFacE+38Dw2P+gmYDEFTZUWfweO6A="
+

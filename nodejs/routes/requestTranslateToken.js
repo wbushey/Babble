@@ -2,7 +2,7 @@
 var fs = require('fs');
 var https = require('https');
 var querystring = require('querystring');
-var secret = require('./secret.js');
+var secrets = require('../utils/getSecrets.js');
 
 exports.get = function(request, response){
   response.setHeader("Content-Type", "application/json");
@@ -29,8 +29,8 @@ exports.get = function(request, response){
   });
   console.log("Post_req created");
   var post_data = querystring.stringify({
-      'client_id': secret.client_id,
-      'client_secret': secret.client_secret,
+      'client_id': secrets.getSecret('client_id'),
+      'client_secret': secrets.getSecret('client_secret'),
       'scope': 'http://api.microsofttranslator.com/',
       'grant_type': 'client_credentials'
   });

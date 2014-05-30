@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/wbushey/Babble.svg)](https://travis-ci.org/wbushey/Babble)
+
 Babble
 ======
 
@@ -101,3 +103,35 @@ that guide our development.
 * [Socket.io Docs](http://socket.io/docs/)
 * [Server API](http://socket.io/docs/server-api/)
 * [Client API](http://socket.io/docs/client-api/)
+
+Testing
+=======
+
+Tuts+ has a [great article](http://code.tutsplus.com/tutorials/testing-in-nodejs--net-35018)
+on using [Mocha](http://visionmedia.github.io/mocha/) and [Chai](http://chaijs.com/)
+for testing in Node.js, as well as general Test Driven Development in Node.js.
+
+And [here's an article](http://liamkaufman.com/blog/2012/01/28/testing-socketio-with-mocha-should-and-socketio-client/)
+on testing the client side of Socket.io.
+
+[Travis-CI](https://travis-ci.org/) provides contineous integration. Awesome.
+
+Install Test Requirements
+-------------------------
+
+    npm install -g mocha
+    npm install chai
+
+Secrets
+=======
+
+In order to allow both developers and Travis-CI to access needed secret keys,
+the utils/getSecrets module was created that contains the
+getSecret(secret_name) function. This function will return the value of
+secret_name from either a secret.js file found in the utils folder, or from
+environmental variables if Babble is running on Travis-CI.
+
+Example of using getSecrets:
+
+    var secerts = require('utils/getSecrets');
+    var our_little_secret = secerts.getSecret('our_little_secret');
