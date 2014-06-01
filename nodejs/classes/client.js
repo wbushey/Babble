@@ -125,6 +125,7 @@ Client.prototype.socket = function(new_socket){
  */
 Client.prototype.emit = function(msg, from_lang, output_media){
 
+// At some point this should call fetchTranslation from ../utils/*-fetchTranslation
 }
 
 module.exports = Client
