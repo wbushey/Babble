@@ -33,11 +33,11 @@ Clients.prototype.name = function(new_name){
 }
  
 /**
- * Translates the provided message and sends the translation, in appropriate
- * media, to all clients in the list.
+ * Translates the provided message and sends the translation and provided 
+ * aciton, in appropriate media, to all clients in the list.
  *
- * If ignore_clients is provided, than the provided message will not be
- * translated and emitted to any Client objects in the Clients list that are
+ * If ignore_clients is provided, than the provided message and action will not
+ * be translated and emitted to any Client objects in the Clients list that are
  * also in the ignore_clients list.
  *
  * If output_media is provided, it will determine which media to translate to
@@ -48,6 +48,7 @@ Clients.prototype.name = function(new_name){
  * associated behaviors.
  *
  * @method broadcast 
+ * @param {String} action The Socket.IO action to broadcast
  * @param {String} msg The string to translate and broadcast
  * @param {String} from_lang Language code for the language that msg is 
  *                           currently in

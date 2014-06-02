@@ -104,10 +104,11 @@ Client.prototype.socket = function(new_socket){
 }
 
 /**
- * Translates the provided message and sends the translation, in appropriate
- * media, to the client. If output_media is provided, it will determine which
- * media to translate to and emit. Otherwise, the Client's output_media 
- * property will be used to determine which media to output to.
+ * Translates the provided message and sends the translation with the provided 
+ * action, in appropriate media, to the client. If output_media is provided, 
+ * it will determine which media to translate to and emit. Otherwise, the 
+ * Client's output_media property will be used to determine which media to 
+ * output to.
  *
  * What actually is emitted various between the output media.
  * When using the "text" output medium, translations will be emitted as a
@@ -115,10 +116,8 @@ Client.prototype.socket = function(new_socket){
  * When using the "audio" output medium, translations will be emitted as a
  * URL to an audio stream of the translation.
  *
- * The translated message will be sent via Socket.io, using the 'new message'
- * action.
- *
  * @method emit
+ * @param {String} action The Socket.IO action to emit
  * @param {String} msg The string to translate
  * @param {String} from_lang Language code for the language that msg is 
  *                           currently in

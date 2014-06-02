@@ -137,10 +137,10 @@ describe("Client", function(){
       client.emit({msg: 'Hi', from_lang: 'en'});
       expect(socket.emitted).to.equal('Hi');
     });
-    it("should emit a message using the 'new message' action", function(){
+    it("should emit a message using the provided action", function(){
       var socket = new Socket();
       var client = new Client({socket: socket});
-      client.emit({msg: 'Hi', from_lang: 'en'});
+      client.emit({acton: 'new message', msg: 'Hi', from_lang: 'en'});
       expect(socket.action).to.equal('new message');
     });
     it("should emit an object containing .text = 'hola' when asked to translate 'hello' to Spanish in text", function(){
@@ -196,7 +196,7 @@ describe('Clients', function(){
       var clients = new Clients();
       clients.push(client1);
       clients.push(client2);
-      clients.broadcast({msg: 'Hello', from_lang: 'en'});
+      clients.broadcast({action: 'new message', msg: 'Hello', from_lang: 'en'});
       expect(socket1.emitted).to.equal('hola');
       expect(socket2.emitted).to.equal('Salut');
     });
@@ -211,7 +211,7 @@ describe('Clients', function(){
       clients.push(client1);
       clients.push(client2);
       clients.push(client3);
-      clients.broadcast({msg: 'Hello', from_lang: 'en', ignore_clients: [client2, client3]});
+      clients.broadcast({action: 'new message' msg: 'Hello', from_lang: 'en', ignore_clients: [client2, client3]});
       expect(socket1.emitted).to.equal('hola');
       expect(socket2.emitted).to.be.empty;
       expect(socket3.emitted).to.be.empty;
