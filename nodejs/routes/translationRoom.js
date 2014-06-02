@@ -9,7 +9,8 @@ function create(server){
     var clients = new Clients();
 
     /**
-     * Action issued when a client joins the room
+     * Action issued when a client joins the room. The joining client will
+     * be added to the room, and all other clients will be told of the joining.
      *
      * @event join
      * @param name {String} Name of the joining client
