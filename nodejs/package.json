@@ -12,6 +12,8 @@
     "socket.io": "*"
   },
   "devDependencies": {
+    "mocha": "*",
+    "chai": "*",
     "socket.io-client": "*"
   },
   "engines": {
