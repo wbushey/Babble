@@ -115,6 +115,9 @@ Client.prototype.socket = function(new_socket){
  * When using the "audio" output medium, translations will be emitted as a
  * URL to an audio stream of the translation.
  *
+ * The translated message will be sent via Socket.io, using the 'new message'
+ * action.
+ *
  * @method emit
  * @param {String} msg The string to translate
  * @param {String} from_lang Language code for the language that msg is 

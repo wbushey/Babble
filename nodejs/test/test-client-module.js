@@ -6,9 +6,10 @@ var Clients = require('..classes/clients');
 // Setup a dummy Socket with a dummy emit method
 var Socket = function(){
     this.emitted = "";
+    this.action = "";
 };
 
-Socket.prototype.emit = function(msg){
+Socket.prototype.emit = function(action, msg){
     this.emitted = msg;
 }
 
@@ -135,6 +136,12 @@ describe("Client", function(){
       var client = new Client({socket: socket});
       client.emit({msg: 'Hi', from_lang: 'en'});
       expect(socket.emitted).to.equal('Hi');
+    });
+    it("should emit a message using the 'new message' action", function(){
+      var socket = new Socket();
+      var client = new Client({socket: socket});
+      client.emit({msg: 'Hi', from_lang: 'en'});
+      expect(socket.action).to.equal('new message');
     });
     it("should emit an object containing .text = 'hola' when asked to translate 'hello' to Spanish in text", function(){
       var socket = new Socket();
