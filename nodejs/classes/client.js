@@ -123,7 +123,7 @@ Client.prototype.socket = function(new_socket){
  *                                  output_media of the client for this emission
  * @throws {Error} If socket is not already set
  */
-Client.prototype.emit = function(msg, from_lang, output_media){
+Client.prototype.emit = function(params){
 
 // At some point this should call fetchTranslation from ../utils/*-fetchTranslation
 }

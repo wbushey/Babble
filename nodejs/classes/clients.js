@@ -34,10 +34,15 @@ Clients.prototype.name = function(new_name){
  
 /**
  * Translates the provided message and sends the translation, in appropriate
- * media, to all clients in the list. If output_media is provided, it will 
- * determine which media to translate to and broadcast. Otherwise, the 
- * output_media properties of clients in the list will be used to determine 
- * which media to output to each client.
+ * media, to all clients in the list.
+ *
+ * If ignore_clients is provided, than the provided message will not be
+ * translated and emitted to any Client objects in the Clients list that are
+ * also in the ignore_clients list.
+ *
+ * If output_media is provided, it will determine which media to translate to
+ * and broadcast. Otherwise, the output_media properties of clients in the 
+ * list will be used to determine which media to output to each client.
  *
  * Refer to Client#emit for notes on available output_media and their
  * associated behaviors.
@@ -46,11 +51,13 @@ Clients.prototype.name = function(new_name){
  * @param {String} msg The string to translate and broadcast
  * @param {String} from_lang Language code for the language that msg is 
  *                           currently in
+ * @param {Client[]} ignore_clients List of Client objects to not emit a 
+ *                                  broadcast to
  * @param {String[]} [output_media] If provided, this will override the 
  *                                  output_media of the clients for this
  *                                  broadcast
  */
-Clients.prototype.broadcast = function(msg, from_lang, output_media){
+Clients.prototype.broadcast = function(params){
 
 }
 
