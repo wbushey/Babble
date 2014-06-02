@@ -6,16 +6,15 @@
 /**
  * @constructor
  * @alias module:Clients
- * @extends Array
  * @classdesc Represents all of the clients in a room, with a convience method
  *            for broadcasting a translated message to all of them.
  */
 var Clients = function(){
   // Instance Variables
   this._name = "";
+  this._clients = [];
+  this._client_names = [];
 }
-
-Clients.prototype = new Array();
 
 /**
  * Access and modify the Client List's name. If called without an argument, it
@@ -29,6 +28,49 @@ Clients.prototype = new Array();
  * @returns {String} The Client List's name
  */
 Clients.prototype.name = function(new_name){
+
+}
+
+/**
+ * Adds a new client to the room.
+ *
+ * @method insert
+ * @param {Client} The Client to add
+ */
+Clients.prototype.insert = function(new_client){
+
+}
+
+/**
+ * Removes a client from the room.
+ *
+ * @method remove
+ * @param {Client} The Client to remove
+ * @returns {Boolean} True if the Client was removed, False otherwise
+ */
+Clients.prototype.remove = function(leaving_client){
+
+}
+
+/**
+ * Checks whether the provided Client(s) are in the room. Can either check for
+ * a single Client, or an Array of Client objects.
+ *
+ * @method contains
+ * @param {Client or Client[]} Client or Client objects to look for
+ * @returns {Boolean} True if all provided Client objects are in the room, False otherwise
+ */
+Clients.prototype.contains = function(subset){
+
+}
+
+/**
+ * Returns the size of the room - the number of Client objects in the room.
+ *
+ * @method size
+ * @return {Number} Number of Client objects in the room
+ */
+Clients.prototype.size = function(){
 
 }
  

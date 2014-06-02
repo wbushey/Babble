@@ -184,9 +184,9 @@ describe('Clients', function(){
       var client1 = new Client();
       var client2 = new Client();
       var clients = new Clients();
-      expect(clients.push(client1)).to.not.throw(Error);
-      clients.push(client2);
-      expect(clients).to.contain.members([client1, client2]);
+      expect(clients.insert(client1)).to.not.throw(Error);
+      clients.insert(client2);
+      expect(clients.contains([client1, client2])).to.be.true;
     });
     it("should send a message to all Client objects in the Clients list if ignore_clients is not provided", function(){
       var socket1 = new Socket();
@@ -194,8 +194,8 @@ describe('Clients', function(){
       var client1 = new Client({socket: socket1, to_lang: "es", output_media: ["text"]});
       var client2 = new Client({socket: socket2, to_lang: "fr", output_media: ["text"]});
       var clients = new Clients();
-      clients.push(client1);
-      clients.push(client2);
+      clients.insert(client1);
+      clients.insert(client2);
       clients.broadcast({action: 'new message', msg: 'Hello', from_lang: 'en'});
       expect(socket1.emitted).to.equal('hola');
       expect(socket2.emitted).to.equal('Salut');
@@ -208,9 +208,9 @@ describe('Clients', function(){
       var client2 = new Client({socket: socket2, to_lang: "fr", output_media: ["text"]});
       var client3 = new Client({socket: socket3, to_lang: "ja", output_media: ["text"]});
       var clients = new Clients();
-      clients.push(client1);
-      clients.push(client2);
-      clients.push(client3);
+      clients.insert(client1);
+      clients.insert(client2);
+      clients.insert(client3);
       clients.broadcast({action: 'new message' msg: 'Hello', from_lang: 'en', ignore_clients: [client2, client3]});
       expect(socket1.emitted).to.equal('hola');
       expect(socket2.emitted).to.be.empty;
