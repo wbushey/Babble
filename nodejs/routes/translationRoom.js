@@ -3,7 +3,7 @@ var SocketIO = require('socket.io');
 var Clients = require('../classes/clients');
 
 function create(server){
-  io = new SocketIO(server);
+  var io = new SocketIO(server);
 
   io.on('connection', function(socket){
     var clients = new Clients();

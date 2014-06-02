@@ -11,6 +11,9 @@
     "node-simple-router": "*",
     "socket.io": "*"
   },
+  "devDependencies": {
+    "socket.io-client": "*"
+  },
   "engines": {
     "node": ">=0.6"
   }
