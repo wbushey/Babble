@@ -1,39 +1,14 @@
 "use strict";
-var fs = require('fs');
-var https = require('https');
-var querystring = require('querystring');
-var secrets = require('../utils/getSecrets.js');
+var fetchTranslateToken = require('../utils/microsoft-fetchTranslationToken');
+
 
 exports.get = function(request, response){
-  response.setHeader("Content-Type", "application/json");
-
-  var options = {
-    host: 'datamarket.accesscontrol.windows.net',
-    port: 443,
-    path: '/v2/OAuth2-13',
-    method: "POST"
+  // Using the same callback for success and failure
+  var on_completion = function(data){
+    console.log(data);
+    response.end(data);
   };
 
-  var post_req = https.request(options, function(ms_response){
-    ms_response.on('data', function(chunk){
-      console.log(chunk.toString());
-      response.end(chunk.toString());
-    });
-    ms_response.on('error', function(e){
-      console.log("Got error: " + e.message);
-      response.end("Got error: " + e.message);
-    }); 
-  }).on("error", function(e){
-    console.log("Got error: " + e.message);
-    response.end("Got error: " + e.message);
-  });
-  console.log("Post_req created");
-  var post_data = querystring.stringify({
-      'client_id': secrets.getSecret('client_id'),
-      'client_secret': secrets.getSecret('client_secret'),
-      'scope': 'http://api.microsofttranslator.com/',
-      'grant_type': 'client_credentials'
-  });
-  post_req.write(post_data);
-  post_req.end();
+  response.setHeader("Content-Type", "application/json");
+  fetchTranslateToken(on_completion);
 };

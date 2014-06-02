@@ -211,7 +211,7 @@ describe('Clients', function(){
       clients.insert(client1);
       clients.insert(client2);
       clients.insert(client3);
-      clients.broadcast({action: 'new message' msg: 'Hello', from_lang: 'en', ignore_clients: [client2, client3]});
+      clients.broadcast({action: 'new message', msg: 'Hello', from_lang: 'en', ignore_clients: [client2, client3]});
       expect(socket1.emitted).to.equal('hola');
       expect(socket2.emitted).to.be.empty;
       expect(socket3.emitted).to.be.empty;

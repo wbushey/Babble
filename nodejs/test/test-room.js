@@ -15,13 +15,13 @@ var conn_options ={
 var emitteds = [];
 for (var i = 0; i < 5; i++){
   var new_io_client = new io_client.connect(serverURL, conn_options);
-  new_on_client.on('join', function(data){
+  new_io_client.on('join', function(data){
     emitteds[i] = data;
   });
-  new_on_client.on('new message', function(data){
+  new_io_client.on('new message', function(data){
     emitteds[i] = data;
   });
-  new_on_client.on('leave', function(data){
+  new_io_client.on('leave', function(data){
     emitteds[i] = data;
   });
   io_clients.push(new_io_client);
