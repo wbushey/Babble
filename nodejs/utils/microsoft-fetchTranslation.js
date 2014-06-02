@@ -27,17 +27,18 @@ var http = require('http');
  * @param auth_token {String} The authorization token from Microsoft for the request.
  *                            If provided, this will be used for authenticating in lieu
  *                            of requesting another token.
- * @param on_success {OnData} Called when data for from the translation service is available
+ * @param on_data {OnData} Called when data for from the translation service is available
  * @param on_error {OnError} Called when an error is encountered
  * @param on_end {OnEnd} Called when the response from the translation service has finished
  */
 module.exports = function(params){
-  
+
   // Set the state for using or fetching the auth_token
   var auth_token = params.hasOwnProperty('auth_token') ? params.auth_token: "";
   var update_auth_token = function(chunk){
     auth_token += chunk.toString();
   };
+
 
   // Create a nested function to use as a callback if needed
   var _fetchTranslation = function(){
@@ -69,6 +70,13 @@ module.exports = function(params){
     post_req.end();
   };
 
+  // Turn fetched JSON into the actual auth_token once we are finished fetching, then call fetchTranslation
+  var on_end = function(){
+    var received_obj = JSON.parse(auth_token);
+    auth_token = received_obj.access_token
+    _fetchTranslation();
+  };
+
 
   // Get a token if there isn't already one
   if (auth_token){
@@ -76,7 +84,7 @@ module.exports = function(params){
   } else {
     var fetch_options = {
       on_data: update_auth_token,
-      on_end: _fetchTranslation,
+      on_end: on_end,
       on_error: params.on_error
     };
     fetchToken(fetch_options);
