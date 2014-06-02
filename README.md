@@ -116,17 +116,11 @@ on testing the client side of Socket.io.
 
 [Travis-CI](https://travis-ci.org/) provides contineous integration. Awesome.
 
-Install Test Requirements
--------------------------
-
-    npm install -g mocha
-    npm install chai
-
 Run Tests
 ---------
 
     cd nodejs
-    mocha
+    make test
 
 Secrets
 =======
