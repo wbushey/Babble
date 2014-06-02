@@ -1,7 +1,7 @@
 "use strict";
 var expect = require('chai').expect;
 var Client = require('../classes/client');
-var Clients = require('..classes/clients');
+var Clients = require('../classes/clients');
 
 // Setup a dummy Socket with a dummy emit method
 var Socket = function(){
@@ -175,7 +175,7 @@ describe('Clients', function(){
     });
   });
 
-  describe("broadcast()", function(){}
+  describe("broadcast()", function(){
     it("should exist", function(){
       var clients = new Clients();
       expect(clients).to.have.property('broadcast');
