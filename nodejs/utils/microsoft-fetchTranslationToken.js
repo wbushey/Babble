@@ -3,10 +3,15 @@ var https = require('https');
 var querystring = require('querystring');
 var secrets = require('./getSecrets.js');
 
-module.exports = function(on_success, on_failure){
+// Documentation on requesting a Microsoft Translate Token
+// http://msdn.microsoft.com/en-us/library/hh454950.aspx
 
-  if (on_failure === undefined)
-    on_failure = on_success;
+/**
+ * @param on_data On Data callback
+ * @param on_end Callback for end of response
+ * @param on_error Error callback
+ */
+module.exports = function(params){
 
   var options = {
     host: 'datamarket.accesscontrol.windows.net',
@@ -16,15 +21,10 @@ module.exports = function(on_success, on_failure){
   };
 
   var post_req = https.request(options, function(ms_response){
-    ms_response.on('data', function(chunk){
-      on_success(chunk.toString());
-    });
-    ms_response.on('error', function(e){
-      on_failure("Got error: " + e.message);
-    }); 
-  }).on("error", function(e){
-    on_failure("Got error: " + e.message);
-  });
+    ms_response.on('data', params.on_data);    
+    ms_response.on('error', params.on_error);
+    ms_response.on('end', params.on_end);
+  }).on("error", params.on_error); 
 
   var post_data = querystring.stringify({
       'client_id': secrets.getSecret('client_id'),
