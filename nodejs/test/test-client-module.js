@@ -11,7 +11,7 @@ var Socket = function(){
 };
 
 Socket.prototype.emit = function(action, msg){
-    this.emitted = msg;
+    this.emitted = JSON.parse(msg);
     this.action = action;
 };
 
@@ -142,7 +142,7 @@ describe("Client", function(){
       client_objs[0].emit({action: 'new message', msg: 'Hi', from_lang: 'en'});
     });
     it("socket[0].emitted should be what was provided above", function(){
-      expect(sockets[0].emitted).to.equal('Hi');
+      expect(sockets[0].emitted.text).to.equal('Hi');
     });
     it("should emit a message using the provided action", function(){
       expect(sockets[0].action).to.equal('new message');

@@ -153,6 +153,8 @@ Client.prototype.socket = function(new_socket){
  */
 Client.prototype.emit = function(params){
   self = this;
+  var _current_medium = "";
+
   if(this.socket() === undefined)
     throw new Error("Socket not set, can not emit messages");
   if(typeof this.socket().emit !== "function")
@@ -165,8 +167,11 @@ Client.prototype.emit = function(params){
   };
   var on_end = function(data){
     parseString(fetched, function(err, parsed){
-      var translation = parsed.string._
-      self.socket().emit(params.action, translation);
+      var return_obj = {};
+      if (_current_medium = 'text'){
+        return_obj['text'] = parsed.string._;
+      }
+      self.socket().emit(params.action, JSON.stringify(return_obj));
     });
   };
   var on_error = function(e){
