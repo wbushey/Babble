@@ -9,13 +9,13 @@
   },
   "dependencies": {
     "node-simple-router": "*",
-    "socket.io": "*"
+    "socket.io": "*",
+    "xml2js": "*"
   },
   "devDependencies": {
     "mocha": "*",
     "chai": "*",
     "socket.io-client": "*",
-    "xml2js": "*"
   },
   "engines": {
     "node": ">=0.6"

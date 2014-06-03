@@ -1,3 +1,5 @@
+var parseString = require('xml2js').parseString
+var fetchTranslation = require('../utils/microsoft-fetchTranslation')
 /** 
  * @module Client 
  * @namespace 
@@ -9,13 +11,21 @@
  * @classdesc Represents a user connected to the server and makes it easy to
  *            to translate messages to and from the user.
  */
-var Client = function(){
+var Client = function(params){
   // Instance Variables
   this._name = "";
   this._from_lang = "";
   this._to_lang = "";
   this._output_media = [];
   this._socket = null;
+
+  if (params !== undefined){
+    this.name(params.name);
+    this.from_lang(params.from_lang);
+    this.to_lang(params.to_lang);
+    this.output_media(params.output_media);
+    this.socket(params.socket);
+  }
 }
 
 /**
@@ -25,11 +35,13 @@ var Client = function(){
  *
  * @method name
  * @param {String} new_name A string to set the Client's name to
- * @throws {Error} If new_name is provided, it must be a string
  * @returns {String} The Client's name
  */
 Client.prototype.name = function(new_name){
+  if (new_name !== undefined)
+    this._name = new_name
 
+  return this._name;
 }
 
 /**
@@ -42,11 +54,13 @@ Client.prototype.name = function(new_name){
  * @method from_lang
  * @param {String} new_from_lang A string representing the language to 
  *                               translate from for the client
- * @throws {Error} If new_from_lang is provided, it must be a string
  * @returns {String} The Client's language to translate from
  */
 Client.prototype.from_lang = function(new_from_lang){
+  if(new_from_lang !== undefined)
+    this._from_lang = new_from_lang;
 
+  return this._from_lang;
 }
 
 /**
@@ -58,11 +72,13 @@ Client.prototype.from_lang = function(new_from_lang){
  * @method to_lang
  * @param {String} new_to_lang A string representing the language to translate 
                                to for the client
- * @throws {Error} If new_to_lang is provided, it must be a string
  * @returns {String} The Client's language to translate to
  */
 Client.prototype.to_lang = function(new_to_lang){
+  if(new_to_lang !== undefined)
+    this._to_lang = new_to_lang
 
+  return this._to_lang
 }
 
 
@@ -80,12 +96,17 @@ Client.prototype.to_lang = function(new_to_lang){
  * @method output_media 
  * @param {String[]} new_output_media An array of strings representing the 
                                media to translate to for the client
- * @throws {Error} If new_output_media is provided, it must be an array of 
-                   strings with only the allowed values.
+ * @throws {Error} If new_output_media is provided, it must be an array 
  * @returns {String[]} The Client's media to output
  */
 Client.prototype.output_media = function(new_output_media){
+  if(new_output_media !== undefined){
+    if(!(new_output_media instanceof Array))
+      throw new Error("output_media must be an Array");
+    this._output_media = new_output_media;
+  }
 
+  return this._output_media;
 }
 
 /**
@@ -96,11 +117,16 @@ Client.prototype.output_media = function(new_output_media){
  *
  * @method socket
  * @param {Socket} new_socket A Socket to set the Client's socket to
- * @throws {Error} If new_socket is provided, it must be a Socket.io Socket
  * @returns {Socket} The Client's socket
  */
 Client.prototype.socket = function(new_socket){
+  if(new_socket !== undefined){
+    if (typeof new_socket.emit !== 'function')
+      throw new Error("socket must have an emit method");
+    this._socket = new_socket;
+  }
 
+  return this._socket;
 }
 
 /**
@@ -126,6 +152,43 @@ Client.prototype.socket = function(new_socket){
  * @throws {Error} If socket is not already set
  */
 Client.prototype.emit = function(params){
+  self = this;
+  if(this.socket() === undefined)
+    throw new Error("Socket not set, can not emit messages");
+  if(typeof this.socket().emit !== "function")
+    throw new Error("Socket does not have an emit method");
+
+  // Set the callbacks
+  var fetched = "";
+  var on_data = function(chunk){
+    fetched += chunk.toString();
+  };
+  var on_end = function(data){
+    parseString(fetched, function(err, parsed){
+      var translation = parsed.string._
+      self.socket().emit(params.action, translation);
+    });
+  };
+  var on_error = function(e){
+    self.socket().emit('error', e.message);
+  };
+
+  // Setup the fetch request
+  var fetch_options = {
+    msg: params.msg,
+    from_lang: params.from_lang,
+    to_lang: this.to_lang(),
+    on_data: on_data,
+    on_end: on_end,
+    on_error: on_error
+  };
+  var output_media = params.output_media ? params.output_media : this.output_media();
+
+  for(i in output_media){
+    fetch_options['medium'] = output_media[i];
+    fetchTranslation(fetch_options);
+  }
+
 
 // At some point this should call fetchTranslation from ../utils/*-fetchTranslation
 }
