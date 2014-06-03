@@ -136,11 +136,15 @@ Client.prototype.socket = function(new_socket){
  * Client's output_media property will be used to determine which media to 
  * output to.
  *
- * What actually is emitted various between the output media.
- * When using the "text" output medium, translations will be emitted as a
- * string containing the actual translation.
- * When using the "audio" output medium, translations will be emitted as a
- * URL to an audio stream of the translation.
+ * What actually is emitted varies between the output media.
+ * All emitted messages will have message_id and orig_text properties.
+ * When using the "text" output medium, the emitted object will include a
+ * "text" property set to a string containing the actual translation.
+ * When using the "audio" output medium, the emitted object will include an 
+ * "audio" property set to translations will be emitted as a URL to an audio
+ * stream of the translation.
+ * If an error occurs during fetching, the emitted object will include an
+ * "error" property set to an object representing the received error.
  *
  * @method emit
  * @param {String} action The Socket.IO action to emit
