@@ -15,7 +15,7 @@
   "devDependencies": {
     "mocha": "*",
     "chai": "*",
-    "socket.io-client": "*",
+    "socket.io-client": "*"
   },
   "engines": {
     "node": ">=0.6"
