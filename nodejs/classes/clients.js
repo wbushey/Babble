@@ -9,11 +9,15 @@
  * @classdesc Represents all of the clients in a room, with a convience method
  *            for broadcasting a translated message to all of them.
  */
-var Clients = function(){
+var Clients = function(params){
   // Instance Variables
   this._name = "";
   this._clients = [];
   this._client_names = [];
+
+  if (params !== undefined){
+    this.name(params.name);
+  }
 }
 
 /**
@@ -28,7 +32,11 @@ var Clients = function(){
  * @returns {String} The Client List's name
  */
 Clients.prototype.name = function(new_name){
+  if (new_name !== undefined){
+    this._name = new_name;
+  }
 
+  return this._name;
 }
 
 /**

@@ -170,17 +170,17 @@ describe('Clients', function(){
     });
     it("should return an empty string if no name is passed to the constructor", function(){
       var clients = new Clients();
-      expect(clients.name).to.be.a('string');
-      expect(clients.name).to.empty;
+      expect(clients.name()).to.be.a('string');
+      expect(clients.name()).to.empty;
     });
     it("should return a string provided to it via the constructor", function(){
       var clients = new Clients({name: "International Discussion"});
-      expect(clients.name).to.equal("International Discussion");
+      expect(clients.name()).to.equal("International Discussion");
     });
     it("should be able to set the name to a string", function(){
       var clients = new Clients();
       clients.name("International Discussion");
-      expect(clients.name).to.equal("International Discussion");
+      expect(clients.name()).to.equal("International Discussion");
     });
   });
 
