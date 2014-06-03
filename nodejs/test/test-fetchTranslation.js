@@ -16,6 +16,7 @@ var on_error = function(e){
 describe('fetchTranslation', function(){
   describe('microsoft-fetchTranslation', function(){
     it("should fetch 'hola', the Spanish for 'hello', from Microsoft's Translation service", function(done){
+      this.setTimeout(5000);
       var on_end = function(){
         parseString(fetched, function(err, parsed){
           result = parsed.string._
