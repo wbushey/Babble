@@ -72,7 +72,7 @@ Clients.prototype.insert = function(new_client){
  */
 Clients.prototype.remove = function(leaving_client){
   var i = -1;
-  if (typeof leaving_client === 'Client'){
+  if (typeof leaving_client.name === 'function'){
     i = this._clients.indexOf(leaving_client);
   } else if (typeof leaving_client === 'string'){
     i = this._client_names.indexOf(leaving_client);
@@ -86,7 +86,7 @@ Clients.prototype.remove = function(leaving_client){
 
   delete this._clients[i];
   delete this._client_names[i];
-  return false;
+  return true;
 }
 
 /**
@@ -98,9 +98,9 @@ Clients.prototype.remove = function(leaving_client){
  * @returns {Boolean} true if all provided Client objects are in the room, false otherwise
  */
 Clients.prototype.contains = function(subset){
-  if (typeof subset = 'string'){
+  if (typeof subset === 'string'){
     return (this._client_names.indexOf(subset) !== -1) ? true : false;
-  } else if (typeof subset = 'Client'){
+  } else if (typeof subset.name === 'function'){
     return (this._clients.indexOf(subset) !== -1) ? true : false;
   } else if (subset instanceof Array){
     return subset.every(this.contains, this);
@@ -116,7 +116,7 @@ Clients.prototype.contains = function(subset){
  * @return {Number} Number of Client objects in the room
  */
 Clients.prototype.size = function(){
-  return this._clients.length;
+  return this._clients.filter(function(v){return v !== undefined}).length;
 }
  
 /**
@@ -146,7 +146,20 @@ Clients.prototype.size = function(){
  *                                  broadcast
  */
 Clients.prototype.broadcast = function(params){
-
+  if (params.ignore_clients === undefined)
+    params.ignore_clients = [];
+  var emit_params = {
+      action: params.action,
+      msg: params.msg,
+      from_lang: params.from_lang,
+      output_media: params.output_media
+  };
+  this._clients.filter(function(v){return v !== undefined}).forEach(function(client){
+    if (params.ignore_clients.indexOf(client) === -1)
+      if (client.socket().name)
+        console.log('Emitting to socket ' + client.socket().name);
+      client.emit(emit_params); 
+  });
 }
 
 module.exports = Clients

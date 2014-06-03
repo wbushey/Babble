@@ -15,6 +15,15 @@ Socket.prototype.emit = function(action, msg){
     this.action = action;
 };
 
+var insert_done = function(socket, done){
+  socket.real_emit = socket.emit;
+  socket.emit = function(action, msg){
+    socket.real_emit(action, msg);
+    done();
+  };
+  return socket;
+};
+
 var sockets = [];
 var client_objs = [];
 
@@ -132,12 +141,7 @@ describe("Client", function(){
       expect(function(){client.emit({msg: 'dummy', from_lang: 'en'})}).to.throw(Error);
     });
     it("should call the instance's socket.emit() method with whatever arguments are provided", function(done){
-      sockets[0] = new Socket();
-      sockets[0].real_emit = sockets[0].emit;
-      sockets[0].emit = function(action, msg){
-        sockets[0].real_emit(action, msg);
-        done();
-      };
+      sockets[0] = insert_done(new Socket(), done);
       client_objs[0] = new Client({socket: sockets[0], to_lang: 'en', output_media: ['text']});
       client_objs[0].emit({action: 'new message', msg: 'Hi', from_lang: 'en'});
     });
@@ -163,6 +167,21 @@ describe("Client", function(){
 });
 
 var clients;
+client_objs = [];
+sockets = [];
+var insert_count_and_done = function(socket, done){
+  socket.real_emit = socket.emit;
+  socket.emit = function(action, msg){
+  console.log("emitting " + msg + " to socket " + socket.name);
+  socket.real_emit(action, msg);
+  clients.done++;
+  console.log("clients.done: " + clients.done);
+  if (clients.done == clients.size())
+    done();
+  };
+  return socket;
+};
+
 describe('Clients', function(){
   describe("name()", function(){
     it("should exist", function(){
@@ -194,7 +213,9 @@ describe('Clients', function(){
   describe("insert()", function(){
     it("should increase the size of the room by one", function(){
       var room_size = clients.size();
-      clients.insert(new Client({name: 'Tester 1'}));
+      sockets[0] = new Socket();
+      client_objs[0] = new Client({name: 'Tester 1', socket: sockets[0]}); 
+      clients.insert(client_objs[0]);
       expect(clients.size()).to.equal(room_size + 1);
     });
     it("should only accept objects with an emit method", function(){
@@ -203,30 +224,59 @@ describe('Clients', function(){
     });
   });
 
+  describe("contains()", function(){
+    it("should return true if searching for Client objects that are in the room", function(){
+      sockets[1] = new Socket();
+      client_objs[1] = new Client({name: 'Tester 2', socket: sockets[1]});
+      clients.insert(client_objs[1]);
+      expect(clients.contains(['Tester 1', client_objs[1]])).to.be.true;
+    });
+    it("should return false if searching for a Client that isn't in the room", function(){
+      expect(clients.contains('foobar 1')).to.be.false;
+    });
+  });
+
+  describe("remove()", function(){
+    it("should successfully remove a client that it contains by name", function(){
+      expect(clients.remove('Tester 1')).to.be.true;
+      expect(clients.remove(client_objs[1])).to.be.true;
+      expect(clients.contains(client_objs[0])).to.be.false;
+      expect(clients.contains('Tester 2')).to.be.false;
+    });
+  });
+
   describe("broadcast()", function(){
     it("should exist", function(){
-      var clients = new Clients();
       expect(clients).to.have.property('broadcast');
     });
-    it("should be able to add Client objects to it", function(){
-      var client1 = new Client();
-      var client2 = new Client();
-      var clients = new Clients();
-      expect(clients.insert(client1)).to.not.throw(Error);
-      clients.insert(client2);
-      expect(clients.contains([client1, client2])).to.be.true;
-    });
-    it("should send a message to all Client objects in the Clients list if ignore_clients is not provided", function(){
-      var socket1 = new Socket();
-      var socket2 = new Socket();
-      var client1 = new Client({socket: socket1, to_lang: "es", output_media: ["text"]});
-      var client2 = new Client({socket: socket2, to_lang: "fr", output_media: ["text"]});
-      var clients = new Clients();
-      clients.insert(client1);
-      clients.insert(client2);
+    it("should send a message to all Client objects in the Clients list if ignore_clients is not provided", function(done){
+      this.timeout(10000);
+      
+
+      clients.done = 0;
+      sockets[0] = new Socket();
+      sockets[0].name = '0';
+      client_objs[0] = new Client({name: 'Tester 1', socket: sockets[0], output_media: ['text', 'audio'], to_lang: 'es'}); 
+      sockets[1] = new Socket();
+      sockets[1].name = '1';
+      client_objs[1] = new Client({name: 'Tester 2', socket: sockets[1], output_media: ['text', 'audio'], to_lang: 'fr'});
+      sockets = sockets.map(function(s){return insert_count_and_done(s, done)});
+      clients.insert(client_objs[0]);
+      clients.insert(client_objs[1]);
+      var broadcast_params = {
+        action: 'new message',
+        msg: 'Hello',
+        from_lang: 'en'
+      };
       clients.broadcast({action: 'new message', msg: 'Hello', from_lang: 'en'});
-      expect(socket1.emitted).to.equal('hola');
-      expect(socket2.emitted).to.equal('Salut');
+    });
+    it("sockets[0].emitted.text should be 'Hola', sockets[1].emitted.text should be 'Salut'", function(){
+      for (var i = 0; i < sockets.length; i++){
+        console.log("sockets[" + i + "]");
+        console.log(JSON.stringify(sockets[i].emitted, null, 4));
+      }
+      expect(sockets[0].emitted.text).to.equal('Hola');
+      expect(sockets[1].emitted.text).to.equal('Salut');
     });
     it("should not send a message to all Client objects provided in an ignore_clients list", function(){
       var socket1 = new Socket();

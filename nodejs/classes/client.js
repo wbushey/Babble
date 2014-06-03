@@ -152,8 +152,8 @@ Client.prototype.socket = function(new_socket){
  * @throws {Error} If socket is not already set
  */
 Client.prototype.emit = function(params){
-  self = this;
-  var _current_medium = "";
+  var self = this;
+  var output_media = params.output_media ? params.output_media : this.output_media();
 
   if(this.socket() === undefined)
     throw new Error("Socket not set, can not emit messages");
@@ -168,9 +168,19 @@ Client.prototype.emit = function(params){
   var on_end = function(data){
     parseString(fetched, function(err, parsed){
       var return_obj = {};
-      if (_current_medium = 'text'){
-        return_obj['text'] = parsed.string._;
+      return_obj['message_id'] = (new Date()).valueOf();
+      return_obj['orig_text'] = params.msg;
+      if (parsed.hasOwnProperty('string')){
+        if (output_media.indexOf('text') !== -1)
+          return_obj['text'] = parsed.string._;
+        if (output_media.indexOf('audio') !== -1)
+          return_obj['audio'] = '/SETME?id=' + return_obj['message_id'];
+      } else if (parsed.hasOwnProperty('html')){
+        return_obj['error'] = parsed.html;
+      } else {
+        return_obj['error'] = parsed;
       }
+
       self.socket().emit(params.action, JSON.stringify(return_obj));
     });
   };
@@ -187,12 +197,9 @@ Client.prototype.emit = function(params){
     on_end: on_end,
     on_error: on_error
   };
-  var output_media = params.output_media ? params.output_media : this.output_media();
 
-  for(i in output_media){
-    fetch_options['medium'] = output_media[i];
-    fetchTranslation(fetch_options);
-  }
+  fetch_options['medium'] = 'text';
+  fetchTranslation(fetch_options);
 
 
 // At some point this should call fetchTranslation from ../utils/*-fetchTranslation
