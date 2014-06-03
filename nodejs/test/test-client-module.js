@@ -162,25 +162,44 @@ describe("Client", function(){
   });
 });
 
+var clients;
 describe('Clients', function(){
   describe("name()", function(){
     it("should exist", function(){
-      var clients = new Clients();
+      clients = new Clients();
       expect(clients).to.have.property('name');
     });
     it("should return an empty string if no name is passed to the constructor", function(){
-      var clients = new Clients();
+      clients = new Clients();
       expect(clients.name()).to.be.a('string');
       expect(clients.name()).to.empty;
     });
     it("should return a string provided to it via the constructor", function(){
-      var clients = new Clients({name: "International Discussion"});
+      clients = new Clients({name: "International Discussion"});
       expect(clients.name()).to.equal("International Discussion");
     });
     it("should be able to set the name to a string", function(){
-      var clients = new Clients();
+      clients = new Clients();
       clients.name("International Discussion");
       expect(clients.name()).to.equal("International Discussion");
+    });
+  });
+
+  describe("size()", function(){
+    it("should return a number", function(){
+      expect(clients.size()).to.be.a('number');
+    });
+  });
+
+  describe("insert()", function(){
+    it("should increase the size of the room by one", function(){
+      var room_size = clients.size();
+      clients.insert(new Client({name: 'Tester 1'}));
+      expect(clients.size()).to.equal(room_size + 1);
+    });
+    it("should only accept objects with an emit method", function(){
+      expect(function(){clients.insert(undefined)}).to.throw(Error);
+      expect(function(){clients.insert(new Object())}).to.throw(Error);
     });
   });
 

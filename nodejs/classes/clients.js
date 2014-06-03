@@ -47,6 +47,20 @@ Clients.prototype.name = function(new_name){
  */
 Clients.prototype.insert = function(new_client){
 
+  if (new_client === undefined)
+    throw new Error("Attempting to add undefined to a Clients List");
+
+  if (typeof new_client.emit !== 'function')
+    throw new Error("Attempting to add a Client that does not have an emit method");
+
+  if (this._client_names.indexOf(new_client.name()) !== -1){
+    throw new Error("Client " + new_client.name() + " already in list.");
+  }
+
+  this._clients.push(new_client);
+  this._client_names.push(new_client.name());
+
+  return new_client;
 }
 
 /**
@@ -54,10 +68,25 @@ Clients.prototype.insert = function(new_client){
  *
  * @method remove
  * @param {Client} The Client to remove
- * @returns {Boolean} True if the Client was removed, False otherwise
+ * @returns {Boolean} true if the Client was removed, false otherwise
  */
 Clients.prototype.remove = function(leaving_client){
+  var i = -1;
+  if (typeof leaving_client === 'Client'){
+    i = this._clients.indexOf(leaving_client);
+  } else if (typeof leaving_client === 'string'){
+    i = this._client_names.indexOf(leaving_client);
+  } else {
+    throw new Error("Can only attempt to remove a Client or the name of a Client");
+  }
 
+  if (i === -1){
+    return false;
+  }
+
+  delete this._clients[i];
+  delete this._client_names[i];
+  return false;
 }
 
 /**
@@ -66,10 +95,18 @@ Clients.prototype.remove = function(leaving_client){
  *
  * @method contains
  * @param {Client or Client[]} Client or Client objects to look for
- * @returns {Boolean} True if all provided Client objects are in the room, False otherwise
+ * @returns {Boolean} true if all provided Client objects are in the room, false otherwise
  */
 Clients.prototype.contains = function(subset){
-
+  if (typeof subset = 'string'){
+    return (this._client_names.indexOf(subset) !== -1) ? true : false;
+  } else if (typeof subset = 'Client'){
+    return (this._clients.indexOf(subset) !== -1) ? true : false;
+  } else if (subset instanceof Array){
+    return subset.every(this.contains, this);
+  } else {
+    throw new Error("Can only see if the Client List contains a client's name, a Client, or an Array of client names or Client objects");
+  }
 }
 
 /**
@@ -79,7 +116,7 @@ Clients.prototype.contains = function(subset){
  * @return {Number} Number of Client objects in the room
  */
 Clients.prototype.size = function(){
-
+  return this._clients.length;
 }
  
 /**
