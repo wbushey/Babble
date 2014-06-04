@@ -172,10 +172,8 @@ sockets = [];
 var insert_count_and_done = function(socket, done){
   socket.real_emit = socket.emit;
   socket.emit = function(action, msg){
-  console.log("emitting " + msg + " to socket " + socket.name);
   socket.real_emit(action, msg);
   clients.done++;
-  console.log("clients.done: " + clients.done);
   if (clients.done == clients.size())
     done();
   };

@@ -156,8 +156,6 @@ Clients.prototype.broadcast = function(params){
   };
   this._clients.filter(function(v){return v !== undefined}).forEach(function(client){
     if (params.ignore_clients.indexOf(client) === -1)
-      if (client.socket().name)
-        console.log('Emitting to socket ' + client.socket().name);
       client.emit(emit_params); 
   });
 }
