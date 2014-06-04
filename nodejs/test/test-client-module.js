@@ -180,6 +180,13 @@ var insert_count_and_done = function(socket, done){
   return socket;
 };
 
+var print_all_sockets = function(){
+  for (var i = 0; i < sockets.length; i++){
+    console.log("Client Socket " + i + " received:");
+    console.log(JSON.stringify(sockets[i].emitted, null, 4));
+  }
+}
+
 describe('Clients', function(){
   describe("name()", function(){
     it("should exist", function(){
@@ -249,7 +256,8 @@ describe('Clients', function(){
     });
     it("should send a message to all Client objects in the Clients list if ignore_clients is not provided", function(done){
       this.timeout(10000);
-      
+      console.log();
+      console.log('Braodcasting to Clients 0 and 1');
 
       clients.done = 0;
       sockets[0] = new Socket();
@@ -269,25 +277,31 @@ describe('Clients', function(){
       clients.broadcast({action: 'new message', msg: 'Hello', from_lang: 'en'});
     });
     it("sockets[0].emitted.text should be 'Hola', sockets[1].emitted.text should be 'Salut'", function(){
-      for (var i = 0; i < sockets.length; i++){
-        console.log("sockets[" + i + "]");
-        console.log(JSON.stringify(sockets[i].emitted, null, 4));
-      }
+      print_all_sockets();
       expect(sockets[0].emitted.text).to.equal('Hola');
       expect(sockets[1].emitted.text).to.equal('Salut');
     });
     it("should not send a message to all Client objects provided in an ignore_clients list", function(done){
+      console.log();
+      console.log('Broadcasting to Clients 0, 1, and 2, with Clients 1 and 2 on the ignore_clients list');
       sockets[0].emitted = "";
       sockets[0].emit = sockets[0].real_emit;
       sockets[0] = insert_done(sockets[0], done);
       sockets[1].emitted = "";
       sockets[1].emit = sockets[1].real_emit;
       sockets[2] = new Socket();
-      clients[2] = new Client({socket: sockets[2], to_lang: "ja", output_media: ["text"]});
-      clients.insert(clients[2]);
-      clients.broadcast({action: 'new message', msg: 'Hello', from_lang: 'en', ignore_clients: [clients[2], clients[3]]});
+      client_objs[2] = new Client({socket: sockets[2], to_lang: "ja", output_media: ["text"]});
+      clients.insert(client_objs[2]);
+      var broadcast_params = {
+        action: 'new message', 
+        msg: 'Hello', 
+        from_lang: 'en', 
+        ignore_clients: [client_objs[1], client_objs[2]]
+      }
+      clients.broadcast(broadcast_params);
     });
     it("sockets[0].emitted.text should be 'Hola', sockets[1] and sockets[2] should be empty", function(){
+      print_all_sockets();
       expect(sockets[0].emitted.text).to.equal('Hola');
       expect(sockets[1].emitted).to.be.empty;
       expect(sockets[2].emitted).to.be.empty;

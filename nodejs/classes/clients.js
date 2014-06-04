@@ -155,8 +155,9 @@ Clients.prototype.broadcast = function(params){
       output_media: params.output_media
   };
   this._clients.filter(function(v){return v !== undefined}).forEach(function(client){
-    if (params.ignore_clients.indexOf(client) === -1)
+    if (params.ignore_clients.indexOf(client) === -1){
       client.emit(emit_params); 
+    }
   });
 }
 

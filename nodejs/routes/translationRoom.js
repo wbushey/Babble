@@ -1,12 +1,13 @@
 "use strict";
 var SocketIO = require('socket.io');
 var Clients = require('../classes/clients');
+var Client = require('../classes/client');
 
 function create(server){
   var io = new SocketIO(server);
+  io.clients = new Clients();
 
-  io.on('connection', function(socket){
-    var clients = new Clients();
+  io.sockets.on('connection', function(socket){
 
     /**
      * Action issued when a client joins the room. The joining client will
@@ -19,7 +20,22 @@ function create(server){
      * @param output_media {String[]} Media the client wants to receive in
      */
     socket.on('join', function(data){
+      if (typeof data === 'string')
+        data = JSON.parse(data);
 
+      console.log('Room: ' + data.name + " is joining");
+      data['socket'] = socket;
+      var new_client = new Client(data);
+      io.clients.insert(new_client);
+
+      var broadcast_params = {
+        action: 'new message',
+        msg: data.name + ' has joined',
+        from_lang: 'en',
+        output_media: ['text'],
+        ignore_clients: [new_client]
+      };
+      io.clients.broadcast(broadcast_params);
     });
 
     /**
