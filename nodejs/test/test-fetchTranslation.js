@@ -14,12 +14,15 @@ var on_error = function(e){
 };
 
 describe('fetchTranslation', function(){
+  this.timeout(10000);
+
   describe('microsoft-fetchTranslation', function(){
     it("should fetch 'hola', the Spanish for 'hello', from Microsoft's Translation service", function(done){
-      this.timeout(5000);
       var on_end = function(){
         parseString(fetched, function(err, parsed){
           result = parsed.string._
+          expect(result).to.be.a('string');
+          expect(result).to.equal('Hola');
           done();
         });
       };
@@ -33,10 +36,6 @@ describe('fetchTranslation', function(){
         on_error: on_error 
       };
       msFetchTranslation(fetch_options);
-    });
-    it("should set the fetched variable equal to 'hola'", function(){
-      expect(result).to.be.a('string');
-      expect(result).to.equal('Hola');
     });
 
     it.skip("should return a URL of an audio stream", function(){

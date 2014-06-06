@@ -20,7 +20,7 @@ for (var i = 0; i < 3; i++){
 var langs = ['en', 'es', 'fr', 'pt', 'ja'];
 
 describe('room', function(){
-  this.timeout(5000);
+  this.timeout(10000);
   describe('join', function(){
 
     it("should tell all room members a new client joined", function(done){

@@ -9,6 +9,7 @@ var sockets = [];
 var client_objs = [];
 
 describe("Client", function(){
+  this.timeout(10000);
 
   describe("name()", function(){
     it("should return an empty string if no name is passed to the constructor", function(){
@@ -130,6 +131,8 @@ client_objs = [];
 sockets = [];
 
 describe('Clients', function(){
+  this.timeout(10000);
+
   describe("name()", function(){
     it("should return an empty string if no name is passed to the constructor", function(){
       clients = new Clients();
