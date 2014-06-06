@@ -62,10 +62,19 @@ function create(server){
     /**
      * Issued when a client leaves the room
      *
-     * @event leave
+     * @event disconnect
      */
-    socket.on('leave', function(data){
-
+    socket.on('disconnect', function(data){
+      if (socket.translation_client){
+        io.clients.remove(socket.translation_client);
+        var broadcast_params{
+          action: 'leave',
+          msg: socket.translation_client.name() + ' has left',
+          from_lang: 'en',
+          output_media: ['text'],
+        };
+        io.clients.broadcast(broadcast_params);
+      }
     });
   });
 
