@@ -1,6 +1,6 @@
 "use strict";
 var expect = require('chai').expect;
-var testify = require('./helpers').testify;
+var createDummyClientSocket = require('./helpers').createDummyClientSocket;
 var clear = require('./helpers').clear;
 var room = require('../routes/translationRoom').create().listen(5000);
 var io_client = require('socket.io-client');
@@ -14,7 +14,7 @@ var conn_options ={
 
 // Setup dummy clients
 for (var i = 0; i < 3; i++){
-  var new_io_client = testify(new io_client.connect(serverURL, conn_options), i);
+  var new_io_client = createDummyClientSocket(i, new io_client.connect(serverURL, conn_options));
   io_clients.push(new_io_client);
 }
 var langs = ['en', 'es', 'fr', 'pt', 'ja'];

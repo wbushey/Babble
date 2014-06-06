@@ -1,5 +1,6 @@
 "use strict";
 var expect = require('chai').expect;
+var createDummyServerSocket = require('./helpers').createDummyServerSocket;
 var Client = require('../classes/client');
 var Clients = require('../classes/clients');
 
@@ -117,12 +118,12 @@ describe("Client", function(){
       expect(function(){client.emit({msg: 'dummy', from_lang: 'en'})}).to.throw(Error);
     });
     it("should call the instance's socket.emit() method with whatever arguments are provided", function(done){
-      sockets[0] = insert_done(new Socket(), done);
+      sockets[0] = insert_done(createDummyServerSocket(0), done);
       client_objs[0] = new Client({socket: sockets[0], to_lang: 'en', output_media: ['text']});
       client_objs[0].emit({action: 'new message', msg: 'Hi', from_lang: 'en'});
     });
     it("socket[0].emitted should be what was provided above", function(){
-      expect(sockets[0].emitted.text).to.equal('Hi');
+      expect(sockets[0].data.text).to.equal('Hi');
     });
     it("should emit a message using the provided action", function(){
       expect(sockets[0].action).to.equal('new message');
@@ -131,13 +132,12 @@ describe("Client", function(){
       client_objs[0].to_lang('es');
       sockets[0].emit = function(action, msg){
         sockets[0].real_emit(action, msg);
+        expect(sockets[0].data).to.have.property('text');
+        expect(sockets[0].data.text).to.equal('Hola');
+        sockets[0].emit = sockets[0].real_emit;
         done();
       };
       client_objs[0].emit({msg: 'Hello', from_lang: 'en'});
-    });
-    it("fetched translation should have a 'text' property equa to 'Hola'", function(){
-      expect(sockets[0].emitted).to.have.property('text');
-      expect(sockets[0].emitted.text).to.equal('Hola');
     });
   });
 });
