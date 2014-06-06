@@ -1,42 +1,29 @@
 "use strict";
 var expect = require('chai').expect;
+var testify = require('./helpers').testify;
+var clear_emitted = require('./helpers').clear_emitted;
 var room = require('../routes/translationRoom').create().listen(5000);
 var io_client = require('socket.io-client');
 var io_clients = [];
 
+// Set client connection parameters
 var serverURL = 'http://localhost:5000';
 var conn_options ={
   forceNew: true
 };
 
-var add_output = function(a_client, i){
-  var self = a_client;
-  self.name = i;
-  self.joined = false;
-  var output = function(data){
-    self.emitted = JSON.parse(data);
-    console.log("Client Socket " + self.name + " recevied: ");
-    console.log(JSON.stringify(self.emitted, null, 4));
-  }
-  
-  self.on('join', output);
-  self.on('new message', output);
-  self.on('leave', output);
-  return self;
-};
-
 // Setup dummy clients
-for (var i = 0; i < 5; i++){
-  var new_io_client = add_output(new io_client.connect(serverURL, conn_options), i);
+for (var i = 0; i < 3; i++){
+  var new_io_client = testify(new io_client.connect(serverURL, conn_options), i);
   io_clients.push(new_io_client);
 }
 var langs = ['en', 'es', 'fr', 'pt', 'ja'];
 
 describe('room', function(){
+  this.timeout(5000);
   describe('join', function(){
 
     it("should tell all room members a new client joined", function(done){
-      this.timeout(5000);
       console.log();
       console.log("Using Socket.IO to connect clients to the server and join the Room. Clients 0 and 1 are joining. Upon Client 1's joining, " +
                   "Client 0 should get a message indicating that Client 1 has joined.");
@@ -105,12 +92,11 @@ describe('room', function(){
   describe('new message', function(){
 
     it("should broadcast the provided message to all clients in their language and media of choice", function(done){
-      io_clients[0].emitted = null;
-      io_clients[1].emitted = null;
-      io_clients[2].emitted = null;
+      io_clients.forEach(clear_emitted);
       var check_message = function(data){
         if(io_clients[0].emitted && io_clients[2].emitted ){
           expect(io_clients[0].emitted.text).to.equal('Hello');
+          expect(io_clients[1].emitted).to.be.null;
           expect(io_clients[2].emitted.text).to.equal('Salut');
           done();
         }
@@ -125,9 +111,8 @@ describe('room', function(){
 
   describe('leave', function(){
     it("should remove the leaving client from the room", function(done){
-      io_clients[0].emitted = null;
-      io_clients[1].emitted = null;
-      io_clients[2].emitted = null;
+      
+      io_clients.forEach(clear_emitted);
       var l = room.clients.size();
 
       var check_leave = function(data){
