@@ -3,19 +3,25 @@
 exports.testify = function(a_client, a_name){
   var self = a_client;
   self.name = a_name;
-  var output = function(data){
-    self.emitted = JSON.parse(data);
-    console.log("Client Socket " + self.name + " recevied: ");
-    console.log(JSON.stringify(self.emitted, null, 4));
+  self.data = null;
+  self.action = null;
+  var output = function(data, action){
+    self.data = JSON.parse(data);
+    self.action = action;
+    console.log("Client Socket " + self.name + " received action '" + self.action + "' with data:");
+    console.log(JSON.stringify(self.data, null, 4));
   }
   
-  self.on('join', output);
-  self.on('new message', output);
-  self.on('leave', output);
+  if (typeof self.on === 'function'){
+    self.on('join', function(data){output(data, 'join');});
+    self.on('new message', function(data){output(data, 'new message');});
+    self.on('leave', function(data){output(data, 'leave');});
+  }
   return self;
 };
 
-// Convience function for clearing client 'output'
-exports.clear_emitted = function(a_client){
-  a_client.emitted = null;
+// Convience function for clearing what the client has received
+exports.clear = function(a_client){
+  a_client.data = null;
+  a_client.action = null;
 }

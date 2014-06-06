@@ -1,7 +1,7 @@
 "use strict";
 var expect = require('chai').expect;
 var testify = require('./helpers').testify;
-var clear_emitted = require('./helpers').clear_emitted;
+var clear = require('./helpers').clear;
 var room = require('../routes/translationRoom').create().listen(5000);
 var io_client = require('socket.io-client');
 var io_clients = [];
@@ -32,29 +32,29 @@ describe('room', function(){
 
       var check_join2 = function(data){
         // Check Conditions
-        if (io_clients[0].emitted && io_clients[1].emitted && io_clients[2].emitted){ 
+        if (io_clients[0].data && io_clients[1].data && io_clients[2].data){ 
           expect(room.clients.size()).to.equal(l + 1);
           l++;
-          expect(io_clients[0].emitted.text).to.equal('2 has joined');
-          expect(io_clients[1].emitted.text).to.equal('2 se ha unido a');
-          expect(io_clients[2].emitted.text).to.equal('2 a rejoint');
+          expect(io_clients[0].data.text).to.equal('2 has joined');
+          expect(io_clients[1].data.text).to.equal('2 se ha unido a');
+          expect(io_clients[2].data.text).to.equal('2 a rejoint');
           done();
         }
       }
 
       var check_join1 = function(data){
         // Check Conditions
-        if (io_clients[0].emitted && io_clients[1].emitted){ 
+        if (io_clients[0].data && io_clients[1].data){ 
           expect(room.clients.size()).to.equal(l + 1);
           l++;
-          expect(io_clients[0].emitted.text).to.equal('1 has joined');
-          expect(io_clients[1].emitted.text).to.equal('1 se ha unido a');
+          expect(io_clients[0].data.text).to.equal('1 has joined');
+          expect(io_clients[1].data.text).to.equal('1 se ha unido a');
 
         // Reset
         io_clients[0].removeListener('join', check_join1);
-        io_clients[0].emitted = null;
+        io_clients[0].data = null;
         io_clients[1].removeListener('join', check_join1);
-        io_clients[1].emitted = null;
+        io_clients[1].data = null;
 
         // Add new listner
         io_clients[0].on('join', check_join2);
@@ -69,11 +69,11 @@ describe('room', function(){
         // Check Condition
         expect(room.clients.size()).to.equal(l + 1);
         l++;
-        expect(io_clients[0].emitted.text).to.equal('0 has joined');
+        expect(io_clients[0].data.text).to.equal('0 has joined');
 
         // Reset
         io_clients[0].removeListener('join', check_join0);
-        io_clients[0].emitted = null;
+        io_clients[0].data = null;
 
         // Add new listner
         io_clients[0].on('join', check_join1);
@@ -92,12 +92,12 @@ describe('room', function(){
   describe('new message', function(){
 
     it("should broadcast the provided message to all clients in their language and media of choice", function(done){
-      io_clients.forEach(clear_emitted);
+      io_clients.forEach(clear);
       var check_message = function(data){
-        if(io_clients[0].emitted && io_clients[2].emitted ){
-          expect(io_clients[0].emitted.text).to.equal('Hello');
-          expect(io_clients[1].emitted).to.be.null;
-          expect(io_clients[2].emitted.text).to.equal('Salut');
+        if(io_clients[0].data && io_clients[2].data ){
+          expect(io_clients[0].data.text).to.equal('Hello');
+          expect(io_clients[1].data).to.be.null;
+          expect(io_clients[2].data.text).to.equal('Salut');
           done();
         }
       };
@@ -112,14 +112,14 @@ describe('room', function(){
   describe('leave', function(){
     it("should remove the leaving client from the room", function(done){
       
-      io_clients.forEach(clear_emitted);
+      io_clients.forEach(clear);
       var l = room.clients.size();
 
       var check_leave = function(data){
-        if(io_clients[0].emitted && io_clients[2].emitted){
+        if(io_clients[0].data && io_clients[2].data){
           expect(room.clients.size()).to.equal(l-1);
-          expect(io_clients[0].emitted.text).to.equal('1 has left');
-          expect(io_clients[2].emitted.text).to.equal('1 a laissé');
+          expect(io_clients[0].data.text).to.equal('1 has left');
+          expect(io_clients[2].data.text).to.equal('1 a laissé');
           done();
         }
       };
