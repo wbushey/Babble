@@ -12,6 +12,7 @@ var conn_options ={
 var add_output = function(a_client, i){
   var self = a_client;
   self.name = i;
+  self.joined = false;
   var output = function(data){
     self.emitted = JSON.parse(data);
     console.log("Client Socket " + self.name + " recevied: ");
@@ -34,27 +35,39 @@ var langs = ['en', 'es', 'pt', 'fr', 'ja'];
 describe('room', function(){
   describe('join', function(){
 
-    it("should tell other room members a new client joined", function(done){
+    it("should tell all room members a new client joined", function(done){
       this.timeout(5000);
       console.log();
       console.log("Using Socket.IO to connect clients to the server and join the Room. Clients 0 and 1 are joining. Upon Client 1's joining, " +
                   "Client 0 should get a message indicating that Client 1 has joined.");
 
       var l = room.clients.size(); 
-      io_clients[0].on('new message', function(data){
-        expect(room.clients.size()).to.equal(l + 2);
-        expect(this.emitted.text).to.equal('1 has joined');
-        done();
+      var check_joins = function(data){
+        console.log('io_clients[0].emitted' + io_clients[0].emitted);
+        console.log('io_clients[1].emitted' + io_clients[1].emitted);
+        if (io_clients[0].emitted && io_clients[1].emitted){ 
+          expect(room.clients.size()).to.equal(l + 2);
+          expect(io_clients[0].emitted.text).to.equal('1 has joined');
+          expect(io_clients[1].emitted.text).to.equal('1 se ha unido a');
+          done();
+        }
+      };
+      io_clients[0].on('join', check_joins);
+      io_clients[1].on('join', check_joins);
+      io_clients[0].on('join', function(){
+        if (!io_clients[1].joined){
+          console.log('1 is about to join');
+          io_clients[1].emit('join', {name: io_clients[1].name, from_lang: langs[1], to_lang: langs[1], output_media: ['text']});
+          io_clients[1].joined = true;
+        };
       });
+      console.log('0 is about to join');
       io_clients[0].emit('join', {name: io_clients[0].name, from_lang: langs[0], to_lang: langs[0], output_media: ['text']});
-      io_clients[1].emit('join', {name: io_clients[1].name, from_lang: langs[1], to_lang: langs[1], output_media: ['text']});
+      io_clients[0].joined = true;
     });
   });
 
   describe('new message', function(){
-    it("should exist", function(){
-
-    });
 
     it("should broadcast the provided message to all clients in their language and media of choice", function(){
 

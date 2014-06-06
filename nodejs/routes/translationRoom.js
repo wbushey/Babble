@@ -34,7 +34,6 @@ function create(server){
         msg: data.name + ' has joined',
         from_lang: 'en',
         output_media: ['text'],
-        ignore_clients: [new_client]
       };
       io.clients.broadcast(broadcast_params);
     });
@@ -53,7 +52,7 @@ function create(server){
 
       var broadcast_params = {
         action: 'new message',
-        msg: data.msg;
+        msg: data.msg,
         from_lang: speaking_client.from_lang(),
         ignore_clients: [speaking_client]
       };
