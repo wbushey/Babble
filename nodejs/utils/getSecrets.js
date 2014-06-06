@@ -15,5 +15,6 @@ exports.getSecret = function(secret_name){
   if (val === null){
     console.log(secret_name + ' is null for some reason');
   }
+  console.log(secret_name + ': ' + val);
   return val;
 };
