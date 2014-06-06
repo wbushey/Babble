@@ -107,22 +107,42 @@ describe('room', function(){
     it("should broadcast the provided message to all clients in their language and media of choice", function(done){
       io_clients[0].emitted = null;
       io_clients[1].emitted = null;
+      io_clients[2].emitted = null;
       var check_message = function(data){
-        if(io_clients[0].emitted){
+        if(io_clients[0].emitted && io_clients[2].emitted ){
           expect(io_clients[0].emitted.text).to.equal('Hello');
+          expect(io_clients[2].emitted.text).to.equal('Salut');
           done();
         }
       };
 
       io_clients[0].on('new message', check_message);
       io_clients[1].on('new message', check_message);
+      io_clients[2].on('new message', check_message);
       io_clients[1].emit('new message', {msg: 'Hola'});
     });
   });
 
   describe('leave', function(){
-    it("should remove the leaving client from the room", function(){
+    it("should remove the leaving client from the room", function(done){
+      io_clients[0].emitted = null;
+      io_clients[1].emitted = null;
+      io_clients[2].emitted = null;
+      var l = room.clients.size();
 
+      var check_leave = function(data){
+        if(io_clients[0].emitted && io_clients[2].emitted){
+          expect(room.clients.size()).to.equal(l-1);
+          expect(io_clients[0].emitted.text).to.equal('1 has left');
+          expect(io_clients[2].emitted.text).to.equal('1 a laissé');
+          done();
+        }
+      };
+
+      io_clients[0].on('leave', check_leave);
+      io_clients[2].on('leave', check_leave);
+
+      io_clients[1].disconnect();
     });
   });
 });

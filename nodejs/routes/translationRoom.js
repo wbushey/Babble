@@ -67,7 +67,7 @@ function create(server){
     socket.on('disconnect', function(data){
       if (socket.translation_client){
         io.clients.remove(socket.translation_client);
-        var broadcast_params{
+        var broadcast_params = {
           action: 'leave',
           msg: socket.translation_client.name() + ' has left',
           from_lang: 'en',
