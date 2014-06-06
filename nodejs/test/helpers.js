@@ -43,5 +43,6 @@ exports.createDummyServerSocket = function(a_name){
   dummyServerSocket.emit = function(action, data){
     dummyServerSocket.output(data, action);
   }
+  dummyServerSocket.real_emit = dummyServerSocket.emit;
   return dummyServerSocket;
 };

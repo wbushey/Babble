@@ -1,33 +1,12 @@
 "use strict";
 var expect = require('chai').expect;
 var createDummyServerSocket = require('./helpers').createDummyServerSocket;
+var clear = require('./helpers').clear;
 var Client = require('../classes/client');
 var Clients = require('../classes/clients');
 
-// Setup a dummy Socket with a dummy emit method
-var Socket = function(){
-    this.emitted = "";
-    this.action = "";
-
-};
-
-Socket.prototype.emit = function(action, msg){
-    this.emitted = JSON.parse(msg);
-    this.action = action;
-};
-
-var insert_done = function(socket, done){
-  socket.real_emit = socket.emit;
-  socket.emit = function(action, msg){
-    socket.real_emit(action, msg);
-    done();
-  };
-  return socket;
-};
-
 var sockets = [];
 var client_objs = [];
-
 
 describe("Client", function(){
 
@@ -117,17 +96,20 @@ describe("Client", function(){
       var client = new Client();
       expect(function(){client.emit({msg: 'dummy', from_lang: 'en'})}).to.throw(Error);
     });
+
     it("should call the instance's socket.emit() method with whatever arguments are provided", function(done){
-      sockets[0] = insert_done(createDummyServerSocket(0), done);
+      sockets[0] = createDummyServerSocket(0);
+      sockets[0].emit = function(action, msg){
+        sockets[0].real_emit(action, msg);
+        expect(sockets[0].data.text).to.equal('Hi');
+        expect(sockets[0].action).to.equal('new message');
+        sockets[0].emit = sockets[0].real_emit;
+        done();
+      }
       client_objs[0] = new Client({socket: sockets[0], to_lang: 'en', output_media: ['text']});
       client_objs[0].emit({action: 'new message', msg: 'Hi', from_lang: 'en'});
     });
-    it("socket[0].emitted should be what was provided above", function(){
-      expect(sockets[0].data.text).to.equal('Hi');
-    });
-    it("should emit a message using the provided action", function(){
-      expect(sockets[0].action).to.equal('new message');
-    });
+
     it("should fetch the correct translation for 'Hi' in Spanish", function(done){
       client_objs[0].to_lang('es');
       sockets[0].emit = function(action, msg){
@@ -142,26 +124,10 @@ describe("Client", function(){
   });
 });
 
+// Reset and prep for Clients testing
 var clients;
 client_objs = [];
 sockets = [];
-var insert_count_and_done = function(socket, done){
-  socket.real_emit = socket.emit;
-  socket.emit = function(action, msg){
-  socket.real_emit(action, msg);
-  clients.done++;
-  if (clients.done == clients.size())
-    done();
-  };
-  return socket;
-};
-
-var print_all_sockets = function(){
-  for (var i = 0; i < sockets.length; i++){
-    console.log("Client Socket " + i + " received:");
-    console.log(JSON.stringify(sockets[i].emitted, null, 4));
-  }
-}
 
 describe('Clients', function(){
   describe("name()", function(){
@@ -190,8 +156,8 @@ describe('Clients', function(){
   describe("insert()", function(){
     it("should increase the size of the room by one", function(){
       var room_size = clients.size();
-      sockets[0] = new Socket();
-      client_objs[0] = new Client({name: 'Tester 1', socket: sockets[0]}); 
+      sockets[0] = createDummyServerSocket(0);
+      client_objs[0] = new Client({name: 'Tester 0', socket: sockets[0]}); 
       clients.insert(client_objs[0]);
       expect(clients.size()).to.equal(room_size + 1);
     });
@@ -203,10 +169,10 @@ describe('Clients', function(){
 
   describe("contains()", function(){
     it("should return true if searching for Client objects that are in the room", function(){
-      sockets[1] = new Socket();
-      client_objs[1] = new Client({name: 'Tester 2', socket: sockets[1]});
+      sockets[1] = createDummyServerSocket(1);
+      client_objs[1] = new Client({name: 'Tester 1', socket: sockets[1]});
       clients.insert(client_objs[1]);
-      expect(clients.contains(['Tester 1', client_objs[1]])).to.be.true;
+      expect(clients.contains(['Tester 0', client_objs[1]])).to.be.true;
     });
     it("should return false if searching for a Client that isn't in the room", function(){
       expect(clients.contains('foobar 1')).to.be.false;
@@ -215,10 +181,10 @@ describe('Clients', function(){
 
   describe("remove()", function(){
     it("should successfully remove a client that it contains by name", function(){
-      expect(clients.remove('Tester 1')).to.be.true;
+      expect(clients.remove('Tester 0')).to.be.true;
       expect(clients.remove(client_objs[1])).to.be.true;
       expect(clients.contains(client_objs[0])).to.be.false;
-      expect(clients.contains('Tester 2')).to.be.false;
+      expect(clients.contains('Tester 1')).to.be.false;
     });
   });
 
@@ -229,13 +195,22 @@ describe('Clients', function(){
       console.log('Braodcasting to Clients 0 and 1');
 
       clients.done = 0;
-      sockets[0] = new Socket();
-      sockets[0].name = '0';
-      client_objs[0] = new Client({name: 'Tester 1', socket: sockets[0], output_media: ['text', 'audio'], to_lang: 'es'}); 
-      sockets[1] = new Socket();
-      sockets[1].name = '1';
-      client_objs[1] = new Client({name: 'Tester 2', socket: sockets[1], output_media: ['text', 'audio'], to_lang: 'fr'});
-      sockets = sockets.map(function(s){return insert_count_and_done(s, done)});
+      sockets[0] = createDummyServerSocket(0);
+      client_objs[0] = new Client({name: 'Tester 0', socket: sockets[0], output_media: ['text', 'audio'], to_lang: 'es'}); 
+      sockets[1] = createDummyServerSocket(1);
+      client_objs[1] = new Client({name: 'Tester 1', socket: sockets[1], output_media: ['text', 'audio'], to_lang: 'fr'});
+      var check_sent_messages = function(action, data){
+        this.real_emit(action, data);
+        this.emit = this.real_emit;
+        if (sockets[0].data && sockets[1].data){
+          expect(sockets[0].data.text).to.equal('Hola');
+          expect(sockets[1].data.text).to.equal('Salut');
+          done();
+        }
+      }
+      sockets[0].emit = check_sent_messages;
+      sockets[1].emit = check_sent_messages;
+
       clients.insert(client_objs[0]);
       clients.insert(client_objs[1]);
       var broadcast_params = {
@@ -245,22 +220,28 @@ describe('Clients', function(){
       };
       clients.broadcast({action: 'new message', msg: 'Hello', from_lang: 'en'});
     });
-    it("sockets[0].emitted.text should be 'Hola', sockets[1].emitted.text should be 'Salut'", function(){
-      print_all_sockets();
-      expect(sockets[0].emitted.text).to.equal('Hola');
-      expect(sockets[1].emitted.text).to.equal('Salut');
-    });
+
     it("should not send a message to all Client objects provided in an ignore_clients list", function(done){
       console.log();
       console.log('Broadcasting to Clients 0, 1, and 2, with Clients 1 and 2 on the ignore_clients list');
-      sockets[0].emitted = "";
-      sockets[0].emit = sockets[0].real_emit;
-      sockets[0] = insert_done(sockets[0], done);
-      sockets[1].emitted = "";
-      sockets[1].emit = sockets[1].real_emit;
-      sockets[2] = new Socket();
+
+      sockets.forEach(clear);
+      sockets[2] = createDummyServerSocket(2);
       client_objs[2] = new Client({socket: sockets[2], to_lang: "ja", output_media: ["text"]});
       clients.insert(client_objs[2]);
+
+      var check_sent_messages = function(action, data){
+        this.real_emit(action, data);
+        this.emit = this.real_emit;
+        if (sockets[0].data){
+          expect(sockets[0].data.text).to.equal('Hola');
+          expect(sockets[1].data).to.be.null;
+          expect(sockets[2].data).to.be.null;
+          done();
+        }
+      };
+      sockets[0].emit = check_sent_messages;
+
       var broadcast_params = {
         action: 'new message', 
         msg: 'Hello', 
@@ -268,12 +249,6 @@ describe('Clients', function(){
         ignore_clients: [client_objs[1], client_objs[2]]
       }
       clients.broadcast(broadcast_params);
-    });
-    it("sockets[0].emitted.text should be 'Hola', sockets[1] and sockets[2] should be empty", function(){
-      print_all_sockets();
-      expect(sockets[0].emitted.text).to.equal('Hola');
-      expect(sockets[1].emitted).to.be.empty;
-      expect(sockets[2].emitted).to.be.empty;
     });
   });
 });
