@@ -7,6 +7,7 @@
 exports.getSecret = function(secret_name){
   var val = null;
   if (process.env.TRAVIS){
+    console.log(JSON.stringify(process.env, null, 4);
     val = process.env[secret_name];
   } else {
     var secrets = require('./secret.js');
