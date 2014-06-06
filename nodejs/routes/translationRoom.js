@@ -26,10 +26,11 @@ function create(server){
       console.log('Room: ' + data.name + " is joining");
       data['socket'] = socket;
       var new_client = new Client(data);
+      socket.translation_client = new_client;
       io.clients.insert(new_client);
 
       var broadcast_params = {
-        action: 'new message',
+        action: 'join',
         msg: data.name + ' has joined',
         from_lang: 'en',
         output_media: ['text'],
@@ -45,7 +46,18 @@ function create(server){
      * @param msg {String} The message to be translated and broadcast
      */
     socket.on('new message', function(data){
+      if (typeof data === 'string')
+        data = JSON.parse(data);
 
+      var speaking_client = socket.translation_client;
+
+      var broadcast_params = {
+        action: 'new message',
+        msg: data.msg;
+        from_lang: speaking_client.from_lang(),
+        ignore_clients: [speaking_client]
+      };
+      io.clients.broadcast(broadcast_params);
     });
 
     /**
