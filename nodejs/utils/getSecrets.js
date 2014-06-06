@@ -12,5 +12,8 @@ exports.getSecret = function(secret_name){
     var secrets = require('./secret.js');
     val = secrets[secret_name];
   }
+  if (val === null){
+    console.log(secret_name + ' is null for some reason');
+  }
   return val;
 };
