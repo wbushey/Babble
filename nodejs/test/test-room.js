@@ -43,8 +43,6 @@ describe('room', function(){
 
       var l = room.clients.size(); 
       var check_joins = function(data){
-        console.log('io_clients[0].emitted' + io_clients[0].emitted);
-        console.log('io_clients[1].emitted' + io_clients[1].emitted);
         if (io_clients[0].emitted && io_clients[1].emitted){ 
           expect(room.clients.size()).to.equal(l + 2);
           expect(io_clients[0].emitted.text).to.equal('1 has joined');
@@ -56,12 +54,10 @@ describe('room', function(){
       io_clients[1].on('join', check_joins);
       io_clients[0].on('join', function(){
         if (!io_clients[1].joined){
-          console.log('1 is about to join');
           io_clients[1].emit('join', {name: io_clients[1].name, from_lang: langs[1], to_lang: langs[1], output_media: ['text']});
           io_clients[1].joined = true;
         };
       });
-      console.log('0 is about to join');
       io_clients[0].emit('join', {name: io_clients[0].name, from_lang: langs[0], to_lang: langs[0], output_media: ['text']});
       io_clients[0].joined = true;
     });
@@ -69,8 +65,19 @@ describe('room', function(){
 
   describe('new message', function(){
 
-    it("should broadcast the provided message to all clients in their language and media of choice", function(){
+    it("should broadcast the provided message to all clients in their language and media of choice", function(done){
+      io_clients[0].emitted = null;
+      io_clients[1].emitted = null;
+      var check_message = function(data){
+        if(io_clients[0].emitted){
+          expect(io_clients[0].emitted.text).to.equal('Hello');
+          done();
+        }
+      };
 
+      io_clients[0].on('new message', check_message);
+      io_clients[1].on('new message', check_message);
+      io_clients[1].emit('new message', {msg: 'Hola'});
     });
   });
 
