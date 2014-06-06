@@ -31,10 +31,6 @@ var client_objs = [];
 describe("Client", function(){
 
   describe("name()", function(){
-    it("should exist", function(){
-      var client = new Client();
-      expect(client).to.have.property('name');
-    });
     it("should return an empty string if no name is passed to the constructor", function(){
       var client = new Client();
       expect(client.name()).to.be.a('string');
@@ -52,10 +48,6 @@ describe("Client", function(){
   });
 
   describe("from_lang()", function(){
-    it("should exist", function(){
-      var client = new Client();
-      expect(client).to.have.property('from_lang');
-    });
     it("should return an empty string if no from_lang is passed to the constructor", function(){
       var client = new Client();
       expect(client.from_lang()).to.be.a('string');
@@ -73,10 +65,6 @@ describe("Client", function(){
   });
 
   describe("to_lang()", function(){
-    it("should exist", function(){
-      var client = new Client();
-      expect(client).to.have.property('to_lang');
-    });
     it("should return an empty string if no to_lang is passed to the constructor", function(){
       var client = new Client();
       expect(client.to_lang()).to.be.a('string');
@@ -94,10 +82,6 @@ describe("Client", function(){
   });
 
   describe("socket()", function(){
-    it("should exist", function(){
-      var client = new Client();
-      expect(client).to.have.property('socket');
-    });
     it("should return null if no socket is passed to the constructor", function(){
       var client = new Client();
       expect(client.socket()).to.be.null;
@@ -108,10 +92,6 @@ describe("Client", function(){
   });
 
   describe("output_media()", function(){
-    it("should exist", function(){
-      var client = new Client();
-      expect(client).to.have.property('output_media');
-    });
     it("should return an empty array if no output_media are passed to the constructor", function(){
       var client = new Client();
       expect(client.output_media()).to.be.an('Array');
@@ -132,10 +112,6 @@ describe("Client", function(){
 
 
   describe("emit()", function(){
-    it("should exist", function(){
-      var client = new Client();
-      expect(client).to.have.property('emit');
-    });
     it("should throw an error if no socket is set", function(){
       var client = new Client();
       expect(function(){client.emit({msg: 'dummy', from_lang: 'en'})}).to.throw(Error);
@@ -189,10 +165,6 @@ var print_all_sockets = function(){
 
 describe('Clients', function(){
   describe("name()", function(){
-    it("should exist", function(){
-      clients = new Clients();
-      expect(clients).to.have.property('name');
-    });
     it("should return an empty string if no name is passed to the constructor", function(){
       clients = new Clients();
       expect(clients.name()).to.be.a('string');
@@ -251,9 +223,6 @@ describe('Clients', function(){
   });
 
   describe("broadcast()", function(){
-    it("should exist", function(){
-      expect(clients).to.have.property('broadcast');
-    });
     it("should send a message to all Client objects in the Clients list if ignore_clients is not provided", function(done){
       this.timeout(10000);
       console.log();
