@@ -95,8 +95,10 @@ describe('room', function(){
       io_clients.forEach(clear);
       var check_message = function(data){
         if(io_clients[0].data && io_clients[2].data ){
+          expect(io_clients[0].data.from_name).to.equal('1');
           expect(io_clients[0].data.text).to.equal('Hello');
           expect(io_clients[1].data).to.be.null;
+          expect(io_clients[2].data.from_name).to.equal('1');
           expect(io_clients[2].data.text).to.equal('Salut');
           done();
         }

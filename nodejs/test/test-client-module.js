@@ -205,11 +205,13 @@ describe('Clients', function(){
         this.real_emit(action, data);
         this.emit = this.real_emit;
         if (sockets[0].data && sockets[1].data){
+          expect(sockets[0].data.from_name).to.equal('Test Master');
           expect(sockets[0].data.text).to.equal('Hola');
           expect(sockets[0].data.audio).to.be.a('string');
           expect(sockets[0].data.audio).to.have.string('/translateAudio');
           expect(sockets[0].data.audio).to.have.string('text=Hola');
           expect(sockets[0].data.audio).to.have.string('to=es');
+          expect(sockets[1].data.from_name).to.equal('Test Master');
           expect(sockets[1].data.text).to.equal('Salut');
           expect(sockets[1].data.audio).to.be.undefined;
           done();
@@ -225,7 +227,7 @@ describe('Clients', function(){
         msg: 'Hello',
         from_lang: 'en'
       };
-      clients.broadcast({action: 'new message', msg: 'Hello', from_lang: 'en'});
+      clients.broadcast({action: 'new message', msg: 'Hello', from_lang: 'en', from_name: 'Test Master'});
     });
 
     it("should not send a message to all Client objects provided in an ignore_clients list", function(done){
@@ -241,6 +243,7 @@ describe('Clients', function(){
         this.real_emit(action, data);
         this.emit = this.real_emit;
         if (sockets[0].data){
+          expect(sockets[0].data.from_name).to.equal('Test Master');
           expect(sockets[0].data.text).to.equal('Hola');
           expect(sockets[1].data).to.be.null;
           expect(sockets[2].data).to.be.null;
@@ -253,6 +256,7 @@ describe('Clients', function(){
         action: 'new message', 
         msg: 'Hello', 
         from_lang: 'en', 
+        from_name: 'Test Master',
         ignore_clients: [client_objs[1], client_objs[2]]
       }
       clients.broadcast(broadcast_params);

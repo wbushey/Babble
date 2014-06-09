@@ -136,6 +136,7 @@ Clients.prototype.size = function(){
  *
  * @method broadcast 
  * @param {String} action The Socket.IO action to broadcast
+ * @param {String} from_name Username of the person that the broadcast is from
  * @param {String} msg The string to translate and broadcast
  * @param {String} from_lang Language code for the language that msg is 
  *                           currently in
@@ -150,6 +151,7 @@ Clients.prototype.broadcast = function(params){
     params.ignore_clients = [];
   var emit_params = {
       action: params.action,
+      from_name: params.from_name,
       msg: params.msg,
       from_lang: params.from_lang,
       output_media: params.output_media

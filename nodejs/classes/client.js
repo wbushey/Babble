@@ -148,6 +148,7 @@ Client.prototype.socket = function(new_socket){
  *
  * @method emit
  * @param {String} action The Socket.IO action to emit
+ * @param {String} from_name Username of the person that the message is from
  * @param {String} msg The string to translate
  * @param {String} from_lang Language code for the language that msg is 
  *                           currently in
@@ -172,6 +173,9 @@ Client.prototype.emit = function(params){
   var on_end = function(data){
     parseString(fetched, function(err, parsed){
       var return_obj = {};
+      if (params.hasOwnProperty('from_name')){
+        return_obj['from_name'] = String(params.from_name);
+      }
       return_obj['message_id'] = (new Date()).valueOf();
       return_obj['orig_text'] = params.msg;
       if (parsed.hasOwnProperty('string')){

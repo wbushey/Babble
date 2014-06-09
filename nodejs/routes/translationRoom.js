@@ -52,6 +52,7 @@ function create(server){
 
       var broadcast_params = {
         action: 'new message',
+        from_name: speaking_client.name(),
         msg: data.msg,
         from_lang: speaking_client.from_lang(),
         ignore_clients: [speaking_client]
