@@ -38,9 +38,22 @@ describe('fetchTranslation', function(){
       msFetchTranslation(fetch_options);
     });
 
-    it.skip("should return a URL of an audio stream", function(){
-      var fetched_translation = msFetchTranslation('hello', 'en', 'es', 'audio');
-      expect(fetched_translation).to.be.a('string');
+    it.skip("should return a URL of an audio stream", function(done){
+      var on_end = function(){
+        console.log('Audio');
+        console.log(fetched);
+        done();
+      }
+      var fetch_options = {
+        msg: 'hello',
+        from_lang: 'en',
+        to_lang: 'es',
+        medium: 'audio',
+        on_data: on_data,
+        on_end: on_end,
+        on_error: on_error
+      };
+      var fetched_translation = msFetchTranslation(fetch_options);
     });
   });
 });

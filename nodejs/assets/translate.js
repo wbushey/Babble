@@ -125,7 +125,7 @@ if (!('webkitSpeechRecognition' in window)) {
     if (timeOut !== 0) {
       window.clearTimeout(timeOut);
     }
-    timeOut = window.setTimeout(copyButton, 3000);
+    timeOut = window.setTimeout(copyButton, 1000);
   };
 }
 

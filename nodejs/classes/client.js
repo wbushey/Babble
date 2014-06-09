@@ -177,8 +177,11 @@ Client.prototype.emit = function(params){
       if (parsed.hasOwnProperty('string')){
         if (output_media.indexOf('text') !== -1)
           return_obj['text'] = parsed.string._;
-        if (output_media.indexOf('audio') !== -1)
-          return_obj['audio'] = '/SETME?id=' + return_obj['message_id'];
+        if (output_media.indexOf('audio') !== -1){
+          return_obj['audio'] = '/translateAudio?mid=' + return_obj['message_id'];
+          return_obj['audio'] += '&text=' + parsed.string._;
+          return_obj['audio'] += '&to=' + self.to_lang();
+        }
       } else if (parsed.hasOwnProperty('html')){
         return_obj['error'] = parsed.html;
       } else {
@@ -202,6 +205,9 @@ Client.prototype.emit = function(params){
     on_error: on_error
   };
 
+  // Note that to do either an audio or text translation, we must first
+  // fetch a text translation. The client's choice of output media is entirely
+  // an option on what the client *receives*.
   fetch_options['medium'] = 'text';
   fetchTranslation(fetch_options);
 

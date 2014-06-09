@@ -193,7 +193,6 @@ describe('Clients', function(){
 
   describe("broadcast()", function(){
     it("should send a message to all Client objects in the Clients list if ignore_clients is not provided", function(done){
-      this.timeout(10000);
       console.log();
       console.log('Braodcasting to Clients 0 and 1');
 
@@ -201,13 +200,18 @@ describe('Clients', function(){
       sockets[0] = createDummyServerSocket(0);
       client_objs[0] = new Client({name: 'Tester 0', socket: sockets[0], output_media: ['text', 'audio'], to_lang: 'es'}); 
       sockets[1] = createDummyServerSocket(1);
-      client_objs[1] = new Client({name: 'Tester 1', socket: sockets[1], output_media: ['text', 'audio'], to_lang: 'fr'});
+      client_objs[1] = new Client({name: 'Tester 1', socket: sockets[1], output_media: ['text'], to_lang: 'fr'});
       var check_sent_messages = function(action, data){
         this.real_emit(action, data);
         this.emit = this.real_emit;
         if (sockets[0].data && sockets[1].data){
           expect(sockets[0].data.text).to.equal('Hola');
+          expect(sockets[0].data.audio).to.be.a('string');
+          expect(sockets[0].data.audio).to.have.string('/translateAudio');
+          expect(sockets[0].data.audio).to.have.string('text=Hola');
+          expect(sockets[0].data.audio).to.have.string('to=es');
           expect(sockets[1].data.text).to.equal('Salut');
+          expect(sockets[1].data.audio).to.be.undefined;
           done();
         }
       }
