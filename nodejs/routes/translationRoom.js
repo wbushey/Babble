@@ -31,6 +31,7 @@ function create(server){
 
       var broadcast_params = {
         action: 'join',
+        from_name: data.name,
         msg: data.name + ' has joined',
         from_lang: 'en',
         output_media: ['text'],

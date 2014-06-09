@@ -19,8 +19,12 @@ router.get("/translateText",
 router.get("/translateAudio", 
   require("./routes/translateAudio").get);
 
+router.get("/chat", require("./routes/chat"));
+
+
 // Configure the HTTP server
 var server = http.createServer(router);
+var room = require("./routes/translationRoom").create(server);
 
 server.listen(80);
 
