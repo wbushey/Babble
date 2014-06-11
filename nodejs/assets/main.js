@@ -87,9 +87,7 @@ $(function() {
   function addChatMessage (data, options) {
     if (typeof data === 'string')
         data = JSON.parse(data);
-    console.log('AddChatMessage: ' + JSON.stringify(data, null, 4));
-    console.log(typeof data);
-    console.log(data.from_name);
+ 
     // Don't fade the message in if there is an 'X was typing'
     var $typingMessages = getTypingMessages(data);
     options = options || {};
@@ -190,7 +188,7 @@ $(function() {
 
   // Gets the color of a username through our hash function
   function getUsernameColor (username) {
-    console.log('username: ' + username);
+
     // Compute hash code
     var hash = 7;
     for (var i = 0; i < username.length; i++) {
