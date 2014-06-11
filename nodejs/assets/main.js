@@ -100,10 +100,14 @@ $(function() {
       cleanInput(data.from_name) + '</span>';
     var messageBodyDiv = '<span class="messageBody">' +
       cleanInput(data.text) + '</span>';
-
+    var OriginalText = '';
+    if (data.orig_text) {
+        OriginalText = '&nbsp;&nbsp;<span class="originalText" style="color:gray; font-size:10pt">' +
+                       data.orig_text + '</span>';
+    }
     var typingClass = data.typing ? 'typing' : '';
     var messageDiv = '<li class="message ' + typingClass + '">' +
-    usernameDiv + messageBodyDiv + '</li>';
+    usernameDiv + messageBodyDiv + OriginalText + '</li>';
     var $messageDiv = $(messageDiv).data('username', data.from_name);
 
     addMessageElement($messageDiv, options);
