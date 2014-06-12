@@ -48,22 +48,18 @@ $(function() {
       $currentInput = $inputMessage.focus();
 
       // Tell the server your username
-      console.log("Hello, " + username);
-      console.log("You told us that you speak " + language);
       socket.emit('join', {name: username,
                            to_lang: language, 
                            from_lang: language, 
-                           output_media: ['text']});
+                           output_media: ['text', 'audio']});
     }
   }
 
   // Sends a chat message
   function sendMessage () {
-    console.log("Trying to send a message");
     var message = $inputMessage.val();
     // Prevent markup from being injected into the message
     message = cleanInput(message);
-    console.log("The message is: " + message);
     // if there is a non-empty message and a socket connection
     if (message && connected) {
       $inputMessage.val('');
@@ -73,7 +69,6 @@ $(function() {
       });
       // tell server to execute 'new message' and send along one parameter
       socket.emit('new message', {msg: message, text: message, from_lang: language});
-      console.log('new message:' + message);
     }
   }
 
@@ -83,6 +78,23 @@ $(function() {
     addMessageElement(el, options);
   }
 
+  // Get the URL for the audio translation
+  function getAudio(d) {
+    console.log(JSON.stringify(d, null, 4));
+    jQuery.get('/requestTranslateToken', function(data) {
+        translation_data = {
+            text : d.text,
+            to : language,
+            from: language,
+            appId : data.access_token,
+            contentType: 'text/plain'
+        };
+        audio_params = jQuery.param(translation_data);
+        $("#player").attr('src', '/translateAudio?' + audio_params);
+        console.log('audio_params = ' + audio_params); 
+    });
+  }
+  
   // Adds the visual chat message to the message list
   function addChatMessage (data, options) {
     if (typeof data === 'string')
@@ -94,7 +106,7 @@ $(function() {
     if ($typingMessages.length !== 0) {
       options.fade = false;
       $typingMessages.remove();
-    }
+    };
     var colorStyle = 'style="color:' + getUsernameColor(data.from_name) + '"';
     var usernameDiv = '<span class="username"' + colorStyle + '>' +
       cleanInput(data.from_name) + '</span>';
@@ -105,12 +117,18 @@ $(function() {
         OriginalText = '&nbsp;&nbsp;<span class="originalText" style="color:gray; font-size:10pt">' +
                        data.orig_text + '</span>';
     }
+    
     var typingClass = data.typing ? 'typing' : '';
     var messageDiv = '<li class="message ' + typingClass + '">' +
-    usernameDiv + messageBodyDiv + OriginalText + '</li>';
+        usernameDiv + messageBodyDiv + OriginalText + '</li>';
     var $messageDiv = $(messageDiv).data('username', data.from_name);
-
     addMessageElement($messageDiv, options);
+    
+    // Insert audio
+    if (data.audio && username != data.from_name) {
+        console.log("Play audio");
+        getAudio(data);
+    }
   }
 
   // Adds the visual chat typing message
@@ -259,7 +277,6 @@ $(function() {
   // Whenever the server emits 'user joined', log it in the chat body
   socket.on('join', function (data) {
     data = JSON.parse(data);
-    console.log('User joined: ' + data.from_name);
     log(data.text);
     addParticipantsMessage(data);
   });
