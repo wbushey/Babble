@@ -27,13 +27,6 @@ $(function() {
   var socket = io();
 
   function addParticipantsMessage (data) {
-//    var message = '';
-//    if (data.numUsers === 1) {
-//      message += "there is 1 participant";
-//    } else {
-//      message += "there are " + data.numUsers + " participants";
-//    }
-//    log(message);
   }
 
   // Sets the client's username
@@ -80,7 +73,6 @@ $(function() {
 
   // Get the URL for the audio translation
   function getAudio(d) {
-    console.log(JSON.stringify(d, null, 4));
     jQuery.get('/requestTranslateToken', function(data) {
         translation_data = {
             text : d.text,
@@ -91,7 +83,6 @@ $(function() {
         };
         audio_params = jQuery.param(translation_data);
         $("#player").attr('src', '/translateAudio?' + audio_params);
-        console.log('audio_params = ' + audio_params); 
     });
   }
   
@@ -112,21 +103,20 @@ $(function() {
       cleanInput(data.from_name) + '</span>';
     var messageBodyDiv = '<span class="messageBody">' +
       cleanInput(data.text) + '</span>';
-    var OriginalText = '';
+    var originalText = '';
     if (data.orig_text) {
-        OriginalText = '&nbsp;&nbsp;<span class="originalText" style="color:gray; font-size:10pt">' +
+        originalText = '&nbsp;&nbsp;<span class="originalText" style="color:gray; font-size:10pt">' +
                        data.orig_text + '</span>';
     }
     
     var typingClass = data.typing ? 'typing' : '';
     var messageDiv = '<li class="message ' + typingClass + '">' +
-        usernameDiv + messageBodyDiv + OriginalText + '</li>';
+        usernameDiv + messageBodyDiv + originalText + '</li>';
     var $messageDiv = $(messageDiv).data('username', data.from_name);
     addMessageElement($messageDiv, options);
     
     // Insert audio
     if (data.audio && username != data.from_name) {
-        console.log("Play audio");
         getAudio(data);
     }
   }
