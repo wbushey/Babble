@@ -16,7 +16,9 @@ $(function() {
 
   var $loginPage = $('.login.page'); // The login page
   var $chatPage = $('.chat.page'); // The chatroom page
-
+  var $player = $('#player'); // The audio player
+  $player.hide();
+  
   // Prompt for setting a username
   var username;
   var connected = true;
@@ -39,7 +41,7 @@ $(function() {
       $chatPage.show();
       $loginPage.off('click');
       $currentInput = $inputMessage.focus();
-
+      $player.show();
       // Tell the server your username
       socket.emit('join', {name: username,
                            to_lang: language, 
@@ -82,7 +84,7 @@ $(function() {
             contentType: 'text/plain'
         };
         audio_params = jQuery.param(translation_data);
-        $("#player").attr('src', '/translateAudio?' + audio_params);
+        $player.attr('src', '/translateAudio?' + audio_params);
     });
   }
   
