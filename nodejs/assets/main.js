@@ -41,7 +41,7 @@ $(function() {
       $chatPage.show();
       $loginPage.off('click');
       $currentInput = $inputMessage.focus();
-      $player.show();
+      
       // Tell the server your username
       socket.emit('join', {name: username,
                            to_lang: language, 
@@ -84,6 +84,7 @@ $(function() {
             contentType: 'text/plain'
         };
         audio_params = jQuery.param(translation_data);
+        $player.show();
         $player.attr('src', '/translateAudio?' + audio_params);
     });
   }
