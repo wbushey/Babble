@@ -7,6 +7,10 @@ $(function() {
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
   ];
 
+  var languages_audio = ['ca', 'de', 'en', 'es', 'fr', 'it', 'nl', 'no',
+                          'pl', 'pt', 'fi', 'sv', 'ru', 'ko', 'zh-CHS', 'ja'];
+  var languages_textonly = ['id', 'ms', 'cs', 'hu', 'ro', 'sk', 'tr', 'bg'];
+  
   // Initialize varibles
   var $window = $(window);
   var $usernameInput = $('#username'); // Input for username
@@ -31,12 +35,22 @@ $(function() {
   function addParticipantsMessage (data) {
   }
 
+  function checkLanguage(language) {
+     if (languages_textonly.indexOf(language) >= 0)
+         return ['text'];
+     if (languages_audio.indexOf(language) >= 0)
+         return ['text', 'audio'];
+     return false;
+  }
+  
   // Sets the client's username
   function setUsername () {
     username = cleanInput($usernameInput.val().trim());
     language = cleanInput($languageInput.val().trim());
-    // If the username is valid
-    if (username && language) {
+    var language_media = checkLanguage(language);
+    if (!language_media) {
+        language = ''
+    } else if (username) {
       connected = true;
       $loginPage.fadeOut();
       $chatPage.show();
@@ -47,7 +61,7 @@ $(function() {
       socket.emit('join', {name: username,
                            to_lang: language, 
                            from_lang: language, 
-                           output_media: ['text', 'audio']});
+                           output_media: language_media});
     }
   }
 
@@ -224,7 +238,7 @@ $(function() {
     // }
     // When the client hits ENTER on their keyboard
     if (event.which === 13) {
-      if (username) {
+      if (username && language) {
         sendMessage();
         socket.emit('stop typing');
         typing = false;
