@@ -21,7 +21,7 @@ $(function() {
   
   // Prompt for setting a username
   var username;
-  var connected = true;
+  var connected = false;
   var typing = false;
   var lastTypingTime;
   var $currentInput = $usernameInput.focus();
@@ -37,6 +37,7 @@ $(function() {
     language = cleanInput($languageInput.val().trim());
     // If the username is valid
     if (username && language) {
+      connected = true;
       $loginPage.fadeOut();
       $chatPage.show();
       $loginPage.off('click');
@@ -267,19 +268,30 @@ $(function() {
     addChatMessage(data);
   });
 
-  // Whenever the server emits 'user joined', log it in the chat body
+  // Whenever the server emits 'join', log it in the chat body
   socket.on('join', function (data) {
     data = JSON.parse(data);
-    log(data.text);
-    addParticipantsMessage(data);
+    if (data.orig_text != username + ' has joined') {
+        log(data.text);
+        addParticipantsMessage(data);
+    }
   });
 
-  // Whenever the server emits 'user left', log it in the chat body
+  // Whenever the server emits 'leave', log it in the chat body
   socket.on('leave', function (data) {
     data = JSON.parse(data);
     log(data.text);
     addParticipantsMessage(data);
     removeChatTyping(data);
+  });
+  
+  // Whenever the server emits 'refused', disconnect
+  socket.on('refused', function (data) {
+      $loginPage.fadeIn();
+      $chatPage.hide();
+      $currentInput = $usernameInput.focus();
+      connected = false;
+      username = '';
   });
 
   // Whenever the server emits 'typing', show the typing message

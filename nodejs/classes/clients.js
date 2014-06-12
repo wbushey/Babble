@@ -54,12 +54,14 @@ Clients.prototype.insert = function(new_client){
     throw new Error("Attempting to add a Client that does not have an emit method");
 
   if (this._client_names.indexOf(new_client.name()) !== -1){
-    throw new Error("Client " + new_client.name() + " already in list.");
+   
+    new_client.emit({action: 'refused'});
+    
+    // throw new Error("Client " + new_client.name() + " already in list.");
+  } else {
+    this._clients.push(new_client);
+    this._client_names.push(new_client.name());
   }
-
-  this._clients.push(new_client);
-  this._client_names.push(new_client.name());
-
   return new_client;
 }
 
