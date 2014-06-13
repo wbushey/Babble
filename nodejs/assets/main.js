@@ -161,6 +161,10 @@ $(function() {
       if (typeof dialect == 'object'){
         dialect = $dialect_select.val();
       }
+      if (dialect == '') {
+        console.log("Hide the microphone");
+        $microphone.hide();
+      };
       console.log('dialect = ', dialect);
       connected = true;
       $loginPage.fadeOut();
