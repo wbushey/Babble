@@ -150,10 +150,18 @@ ul {
   outline: none;
   padding-left: 10px;
   position: absolute;
-  right: 0;
+  right: 0; 
   width: 100%;
 }
 
+.microphone {
+  bottom: 5px;
+  height: 50px;
+  position: absolute;
+  right: 20px;
+  width: 50px;
+}
+
 select {
-  font-size: 200%;
+  font-size: 150%;
 }

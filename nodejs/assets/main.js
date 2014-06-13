@@ -97,7 +97,9 @@ $(function() {
   var $languageDropdown = $('#language_select');
   var $messages = $('.messages'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
-
+  var $microphone = $('.microphone'); // Microphone for audio input
+  var microphone_active = false;
+  
   var $loginPage = $('.login.page'); // The login page
   var $chatPage = $('.chat.page'); // The chatroom page
   var $player = $('#player'); // The audio player
@@ -165,6 +167,7 @@ $(function() {
       $chatPage.show();
       $loginPage.off('click');
       $currentInput = $inputMessage.focus();
+      log("Welcome to Babble");
       
       // Tell the server your username
       socket.emit('join', {name: username,
@@ -361,6 +364,7 @@ $(function() {
     updateTyping();
   });
 
+  
   // Click events
 
   // Focus input when clicking anywhere on login page
@@ -373,6 +377,17 @@ $(function() {
     $inputMessage.focus();
   });
 
+  $microphone.on('click', function() {
+    if (microphone_active) {
+       $microphone.attr('src', 'pics/mic.gif');
+       microphone_active = false;
+    } else {
+       $microphone.attr('src', 'pics/mic-animate.gif');
+       microphone_active = true;
+    }     
+  });
+  
+  
   // Socket events
 
   // Whenever the server emits 'login', log the login message
