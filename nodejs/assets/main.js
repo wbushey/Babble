@@ -6,15 +6,89 @@ $(function() {
     '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
   ];
-
-  var languages_audio = ['ca', 'de', 'en', 'es', 'fr', 'it', 'nl', 'no',
-                          'pl', 'pt', 'fi', 'sv', 'ru', 'ko', 'zh-CHS', 'ja'];
-  var languages_textonly = ['id', 'ms', 'cs', 'hu', 'ro', 'sk', 'tr', 'bg'];
-  
+  var langs = [
+      ['Arabic', 'ar', false, ''],
+      ['Bahasa Indonesia (Indonesian)', 'id', false, 'id-ID'],
+      ['Bahasa Melayu (Malay)', 'ms', false, 'ms-MY'],
+      ['Català (Catalan)', 'ca', true, 'ca-ES'],
+      ['Čeština (Czech)', 'cs', false, 'cs-CZ'],
+      ['Danish', 'da', true, ''],
+      ['Deutsch (German)', 'de', true, 'de-DE'],
+      ['English', 'en', true, [
+        ['en-AU', 'Australia'],
+        ['en-CA', 'Canada'],
+        ['en-IN', 'India'],
+        ['en-NZ', 'New Zealand'],
+        ['en-ZA', 'South Africa'],
+        ['en-GB', 'Great Britain'],
+        ['en-US', 'United States']]],
+      ['Español (Spanish)', 'es', true, [
+        ['es-AR', 'Argentina'],
+        ['es-BO', 'Bolivia'],
+        ['es-CL', 'Chile'],
+        ['es-CO', 'Colombia'],
+        ['es-CR', 'Costa Rica'],
+        ['es-EC', 'Ecuador'],
+        ['es-SV', 'El Salvador'],
+        ['es-ES', 'España'],
+        ['es-US', 'Estados Unidos'],
+        ['es-GT', 'Guatemala'],
+        ['es-HN', 'Honduras'],
+        ['es-MX', 'México'],
+        ['es-NI', 'Nicaragua'],
+        ['es-PA', 'Panamá'],
+        ['es-PY', 'Paraguay'],
+        ['es-PE', 'Perú'],
+        ['es-PR', 'Puerto Rico'],
+        ['es-DO', 'República Dominicana'],
+        ['es-UY', 'Uruguay'],
+        ['es-VE', 'Venezuela']]],
+      ['Estonian', 'et', false, ''],
+      ['Français (French)', 'fr', true, 'fr-FR'],
+      ['Greek', 'el', false, ''],
+      ['Hebrew', 'he', false, ''],
+      ['Hindi', 'hi', false, ''],
+      ['Hmong Daw', 'mww', false, ''],
+      ['Klingon', 'tlh', false, ''],
+      ['Italiano (Italian)', 'it', true, [
+        ['it-IT', 'Italia'],
+        ['it-CH', 'Svizzera']]],
+      ['Latvian', 'lv', false, ''],
+      ['Lithuanian', 'lt', false, ''],
+      ['Magyar (Hungarian)', 'hu', false, 'hu-HU'],
+      ['Maltese', 'mt', false, ''],
+      ['Nederlands (Dutch)', 'nl', true, 'nl-NL'],
+      ['Norsk bokmål (Norwegian)', 'no', true, 'nb-NO'],
+      ['Persian', 'fa', false, ''],
+      ['Polski (Polish)', 'pl', true, 'pl-PL'],
+      ['Português (Portuguese)', 'pt', true, [
+        ['pt-BR', 'Brasil'],
+        ['pt-PT', 'Portugal']]],
+      ['Română (Romanian)', 'ro', false, 'ro-RO'],
+      ['Slovenčina (Slovak)', 'sk', false, 'sk-SK'],
+      ['Slovenian', 'sl', false, ''],
+      ['Suomi (Finnish)', 'fi', true, 'fi-FI'],
+      ['Svenska (Swedish)', 'sv', true, 'sv-SE'],
+      ['Thai', 'th', false, ''],
+      ['Türkçe (Turkish)', 'tr', false, 'tr-TR'],
+      ['Ukrainian', 'uk', false, ''],
+      ['Urdu', 'ur', false, ''],
+      ['Vietnamese', 'vi', false, ''],
+      ['Welsh', 'cy', false, ''],
+      ['български (Bulgarian)', 'bg', false, 'bg-BG'],
+      ['Pусский (Russian)', 'ru', true, 'ru-RU'],
+      ['한국어 (Korean)', 'ko', true, 'ko-KR'],
+      ['中文 (Chinese)', 'zh-CHS', true, [
+          ['cmn-Hans-CN', '普通话 (中国大陆)'],
+          ['cmn-Hans-HK', '普通话 (香港)'],
+          ['cmn-Hant-TW', '中文 (台灣)'],
+          ['yue-Hant-HK', '粵語 (香港)']]],
+      ['日本語 (Japanese)', 'ja', true, 'ja-JP']];
+ 
   // Initialize varibles
   var $window = $(window);
   var $usernameInput = $('#username'); // Input for username
-  var $languageInput = $('#language'); // Input for language
+  var $languageDropdown = $('#language_select');
   var $messages = $('.messages'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
 
@@ -22,7 +96,23 @@ $(function() {
   var $chatPage = $('.chat.page'); // The chatroom page
   var $player = $('#player'); // The audio player
   $player.hide();
+  var $language_select = $('#language_select');
+  var $dialect_select = $('#dialect_select');
+  setDialects(langs[7][3]);
   
+  $language_select.change(function() {
+    var idx = $(this).val();
+    setDialects(langs[idx][3]);
+  });
+         
+  for (var i in langs) {
+     var option = '<option value="' + i + '">' + langs[i][0] + '</option>';
+     $language_select.append(option);
+  }
+  $language_select[0].selectedIndex = 7;
+  $dialect_select[0].selectedIndex = 6;
+  var dialect;
+     
   // Prompt for setting a username
   var username;
   var connected = false;
@@ -34,23 +124,36 @@ $(function() {
 
   function addParticipantsMessage (data) {
   }
-
-  function checkLanguage(language) {
-     if (languages_textonly.indexOf(language) >= 0)
-         return ['text'];
-     if (languages_audio.indexOf(language) >= 0)
-         return ['text', 'audio'];
-     return false;
-  }
+ 
+  function setDialects(dialects) {
+     if (typeof dialects === 'object') {
+        var options = '';
+        for (var i in dialects) {
+            options += '<option value="' + dialects[i][0] + '">' + dialects[i][1] + '</option>';
+        }
+        $dialect_select.html(options);
+        $dialect_select.show();
+      } else {
+        $dialect_select.hide();
+      }
+   }
   
+
   // Sets the client's username
   function setUsername () {
     username = cleanInput($usernameInput.val().trim());
-    language = cleanInput($languageInput.val().trim());
-    var language_media = checkLanguage(language);
-    if (!language_media) {
-        language = ''
-    } else if (username) {
+    if (username) {
+      var language_index = $languageDropdown.val();
+      language = langs[language_index][1];
+      var media = ['text'];
+      if (langs[language_index][2]) {
+        media = ['text', 'audio'];
+      }
+      dialect = langs[language_index][3];
+      if (typeof dialect == 'object'){
+        dialect = $dialect_select.val();
+      }
+      console.log('dialect = ', dialect);
       connected = true;
       $loginPage.fadeOut();
       $chatPage.show();
@@ -61,7 +164,7 @@ $(function() {
       socket.emit('join', {name: username,
                            to_lang: language, 
                            from_lang: language, 
-                           output_media: language_media});
+                           output_media: media});
     }
   }
 

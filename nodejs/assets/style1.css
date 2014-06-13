@@ -153,3 +153,7 @@ ul {
   right: 0;
   width: 100%;
 }
+
+select {
+  font-size: 200%;
+}
