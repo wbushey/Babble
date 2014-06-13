@@ -6,6 +6,12 @@ $(function() {
     '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
   ];
+  // Each element of 'langs' contains the following information:
+  //    0: The name of a language
+  //    1: The Microsoft Translator abbreviation
+  //    2: Does Microsoft provide speech output in this language? (Boolean)
+  //    3: Dialect or array of dialects for Google Web Speech API
+  //       (Equals the empty string '' if Google does not support the language)
   var langs = [
       ['Arabic', 'ar', false, ''],
       ['Bahasa Indonesia (Indonesian)', 'id', false, 'id-ID'],
