@@ -1,5 +1,5 @@
-var parseString = require('xml2js').parseString
-var fetchTranslation = require('../utils/microsoft-fetchTranslation')
+var parseString = require('xml2js').parseString;
+var fetchTranslation = require('../utils/microsoft-fetchTranslation');
 /** 
  * @module Client 
  * @namespace 
@@ -18,6 +18,7 @@ var Client = function(params){
   this._to_lang = "";
   this._output_media = [];
   this._socket = null;
+  this._session = "";
 
   if (params !== undefined){
     this.name(params.name);
@@ -25,8 +26,9 @@ var Client = function(params){
     this.to_lang(params.to_lang);
     this.output_media(params.output_media);
     this.socket(params.socket);
+    this.session(params.session);
   }
-}
+};
 
 /**
  * Access and modify the Client's name. If called without an argument, it will
@@ -39,10 +41,10 @@ var Client = function(params){
  */
 Client.prototype.name = function(new_name){
   if (new_name !== undefined)
-    this._name = new_name
+    this._name = new_name;
 
   return this._name;
-}
+};
 
 /**
  * Access and modify the Client's language to translate from. If called without
@@ -61,7 +63,7 @@ Client.prototype.from_lang = function(new_from_lang){
     this._from_lang = new_from_lang;
 
   return this._from_lang;
-}
+};
 
 /**
  * Access and modify the Client's language to translate to. If called without
@@ -76,10 +78,10 @@ Client.prototype.from_lang = function(new_from_lang){
  */
 Client.prototype.to_lang = function(new_to_lang){
   if(new_to_lang !== undefined)
-    this._to_lang = new_to_lang
+    this._to_lang = new_to_lang;
 
-  return this._to_lang
-}
+  return this._to_lang;
+};
 
 
 
@@ -107,7 +109,7 @@ Client.prototype.output_media = function(new_output_media){
   }
 
   return this._output_media;
-}
+};
 
 /**
  * Access and modify the Client's socket. If called without an argument, it
@@ -127,8 +129,15 @@ Client.prototype.socket = function(new_socket){
   }
 
   return this._socket;
-}
+};
 
+Client.prototype.session = function(new_session){
+  if (new_session !== undefined) {
+    this._session = new_session;
+  }
+  return this._session;
+};
+  
 /**
  * Translates the provided message and sends the translation with the provided 
  * action, in appropriate media, to the client. If output_media is provided, 
@@ -174,22 +183,22 @@ Client.prototype.emit = function(params){
     parseString(fetched, function(err, parsed){
       var return_obj = {};
       if (params.hasOwnProperty('from_name')){
-        return_obj['from_name'] = String(params.from_name);
+        return_obj.from_name = String(params.from_name);
       }
-      return_obj['message_id'] = (new Date()).valueOf();
-      return_obj['orig_text'] = params.msg;
+      return_obj.message_id = (new Date()).valueOf();
+      return_obj.orig_text = params.msg;
       if (parsed.hasOwnProperty('string')){
         if (output_media.indexOf('text') !== -1)
-          return_obj['text'] = parsed.string._;
+          return_obj.text = parsed.string._;
         if (output_media.indexOf('audio') !== -1){
-          return_obj['audio'] = '/translateAudio?mid=' + return_obj['message_id'];
-          return_obj['audio'] += '&text=' + parsed.string._;
-          return_obj['audio'] += '&to=' + self.to_lang();
+          return_obj.audio = '/translateAudio?mid=' + return_obj.message_id;
+          return_obj.audio += '&text=' + parsed.string._;
+          return_obj.audio += '&to=' + self.to_lang();
         }
       } else if (parsed.hasOwnProperty('html')){
-        return_obj['error'] = parsed.html;
+        return_obj.error = parsed.html;
       } else {
-        return_obj['error'] = parsed;
+        return_obj.error = parsed;
       }
 
       self.socket().emit(params.action, JSON.stringify(return_obj));
@@ -212,11 +221,11 @@ Client.prototype.emit = function(params){
   // Note that to do either an audio or text translation, we must first
   // fetch a text translation. The client's choice of output media is entirely
   // an option on what the client *receives*.
-  fetch_options['medium'] = 'text';
+  fetch_options.medium = 'text';
   fetchTranslation(fetch_options);
 
 
 // At some point this should call fetchTranslation from ../utils/*-fetchTranslation
-}
+};
 
-module.exports = Client
+module.exports = Client;

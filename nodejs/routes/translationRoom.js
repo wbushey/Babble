@@ -2,6 +2,8 @@
 var SocketIO = require('socket.io');
 var Clients = require('../classes/clients');
 var Client = require('../classes/client');
+var sessionID = Math.random().toString().substr(2);
+var magic = require('../utils/getSecrets.js').magic;
 
 function create(server){
   var io = new SocketIO(server);
@@ -23,8 +25,7 @@ function create(server){
       if (typeof data === 'string')
         data = JSON.parse(data);
 
-      console.log('Room: ' + data.name + " is joining");
-      data['socket'] = socket;
+      data.socket = socket;
       var new_client = new Client(data);
       socket.translation_client = new_client;
       io.clients.insert(new_client);
@@ -35,12 +36,13 @@ function create(server){
         msg: data.name + ' has joined',
         from_lang: 'en',
         output_media: ['text'],
+        session: data.session
       };
       io.clients.broadcast(broadcast_params);
     });
 
     /**
-     * Action issued when a client sends a message to be tanslated and broadcast
+     * Action issued when a client sends a message to be translated and broadcast
      *
      * @event new message
      * @param msg {String} The message to be translated and broadcast
@@ -59,7 +61,8 @@ function create(server){
         from_name: speaking_client.name(),
         msg: data.msg,
         from_lang: speaking_client.from_lang(),
-        ignore_clients: [speaking_client]
+        ignore_clients: [speaking_client],
+        session: speaking_client.session()
       };
       io.clients.broadcast(broadcast_params);
     });
@@ -71,14 +74,15 @@ function create(server){
      */
     socket.on('disconnect', function(data){
       if (socket.translation_client){
-        io.clients.remove(socket.translation_client);
         var broadcast_params = {
           action: 'leave',
           msg: socket.translation_client.name() + ' has left',
           from_lang: 'en',
           output_media: ['text'],
+          magic: magic     // magic number
         };
         io.clients.broadcast(broadcast_params);
+        io.clients.remove(socket.translation_client);
       }
     });
   });

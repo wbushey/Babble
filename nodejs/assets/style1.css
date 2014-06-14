@@ -42,6 +42,11 @@ ul {
   width: 100%;
 }
 
+.originalText {
+  font-size: 12pt;
+  color: gray;
+}
+
 /* Login Page */
 
 .login.page {

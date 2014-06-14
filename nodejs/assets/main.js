@@ -92,6 +92,7 @@ $(function() {
       ['日本語 (Japanese)', 'ja', true, 'ja-JP']];
  
   // Initialize varibles
+  var sessionID = Math.random().toString().substr(2);
   var $window = $(window);
   var $usernameInput = $('#username'); // Input for username
   var $languageDropdown = $('#language_select');
@@ -110,6 +111,8 @@ $(function() {
   var $chatPage = $('.chat.page'); // The chatroom page
   var $player = $('.player'); // The audio player
   $player.hide();
+  var language;
+  var language_index;
   var $language_select = $('#language_select');
   var $dialect_select = $('#dialect_select');
   setDialects(langs[7][3]);
@@ -126,7 +129,6 @@ $(function() {
   $language_select[0].selectedIndex = 7;
   $dialect_select[0].selectedIndex = 6;
   var dialect;
-  var final_transcript;
      
   // Prompt for setting a username
   var username;
@@ -156,7 +158,7 @@ $(function() {
   function setUsername () {
     username = cleanInput($usernameInput.val().trim());
     if (username) {
-      var language_index = $languageDropdown.val();
+      language_index = $languageDropdown.val();
       language = langs[language_index][1];
       var media = ['text'];
       if (langs[language_index][2]) {
@@ -167,13 +169,11 @@ $(function() {
         dialect = $dialect_select.val();
       }
 
-      if ((dialect == '') || !('webkitSpeechRecognition' in window)){
-        console.log("Hide the microphone");
+      if ((dialect === '') || !('webkitSpeechRecognition' in window)){
         $microphone.hide();
       } else {
         createRecognition();
       }
-      console.log('dialect = ', dialect);
       connected = true;
       $loginPage.fadeOut();
       $chatPage.show();
@@ -182,10 +182,12 @@ $(function() {
       log("Welcome to Babble");
       
       // Tell the server your username
-      socket.emit('join', {name: username,
-                           to_lang: language, 
-                           from_lang: language, 
-                           output_media: media});
+      var join_params = {name: username,
+                         session: sessionID,
+                         to_lang: language, 
+                         from_lang: language, 
+                         output_media: media};
+      socket.emit('join', join_params);
     }
   }
 
@@ -206,7 +208,9 @@ $(function() {
         text: message
       });
       // tell server to execute 'new message' and send along one parameter
-      socket.emit('new message', {msg: message, text: message, from_lang: language});
+      var message_params = {msg: message, text: message, from_lang: language,
+                            session: sessionID};
+      socket.emit('new message', message_params);
     }
   }
 
@@ -219,7 +223,7 @@ $(function() {
   // Get the URL for the audio translation
   function getAudio(d) {
     jQuery.get('/requestTranslateToken', function(data) {
-        translation_data = {
+        var translation_data = {
             text : d.text,
             to : language,
             from: language,
@@ -240,11 +244,11 @@ $(function() {
     var colorStyle = 'style="color:' + getUsernameColor(data.from_name) + '"';
     var usernameDiv = '<span class="username"' + colorStyle + '>' +
       cleanInput(data.from_name) + '</span>';
-    var messageBodyDiv = '<span class="messageBody">' +
-      cleanInput(data.text) + '</span>';
+    var text = cleanInput(data.text);
+    var messageBodyDiv = '<span class="messageBody">' + text + '</span>';
     var originalText = '';
-    if (data.orig_text) {
-        originalText = '&nbsp;&nbsp;<span class="originalText" style="color:gray; font-size:10pt">' +
+    if (data.orig_text && data.orig_text != text) {
+        originalText = '&nbsp;&nbsp;<span class="originalText">' +
                        data.orig_text + '</span>';
     }
     
@@ -452,6 +456,6 @@ $(function() {
     function capitalize(s) {
       return s.replace(first_char, function(m) { 
         return m.toUpperCase(); });
-    };
-  };  
+    }
+  }  
 });

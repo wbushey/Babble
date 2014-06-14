@@ -6,9 +6,11 @@
 /**
  * @constructor
  * @alias module:Clients
- * @classdesc Represents all of the clients in a room, with a convience method
+ * @classdesc Represents all of the clients in a room, with a convenience method
  *            for broadcasting a translated message to all of them.
  */
+
+var magic = require('../utils/getSecrets.js').magic;
 var Clients = function(params){
   // Instance Variables
   this._name = "";
@@ -18,7 +20,7 @@ var Clients = function(params){
   if (params !== undefined){
     this.name(params.name);
   }
-}
+};
 
 /**
  * Access and modify the Client List's name. If called without an argument, it
@@ -37,7 +39,7 @@ Clients.prototype.name = function(new_name){
   }
 
   return this._name;
-}
+};
 
 /**
  * Adds a new client to the room.
@@ -63,7 +65,7 @@ Clients.prototype.insert = function(new_client){
     this._client_names.push(new_client.name());
   }
   return new_client;
-}
+};
 
 /**
  * Removes a client from the room.
@@ -89,7 +91,7 @@ Clients.prototype.remove = function(leaving_client){
   delete this._clients[i];
   delete this._client_names[i];
   return true;
-}
+};
 
 /**
  * Checks whether the provided Client(s) are in the room. Can either check for
@@ -109,7 +111,7 @@ Clients.prototype.contains = function(subset){
   } else {
     throw new Error("Can only see if the Client List contains a client's name, a Client, or an Array of client names or Client objects");
   }
-}
+};
 
 /**
  * Returns the size of the room - the number of Client objects in the room.
@@ -119,7 +121,7 @@ Clients.prototype.contains = function(subset){
  */
 Clients.prototype.size = function(){
   return this._clients.filter(function(v){return v !== undefined}).length;
-}
+};
  
 /**
  * Translates the provided message and sends the translation and provided 
@@ -151,18 +153,35 @@ Clients.prototype.size = function(){
 Clients.prototype.broadcast = function(params){
   if (params.ignore_clients === undefined)
     params.ignore_clients = [];
+  var valid_session = (params.magic == magic);
+  if  (!valid_session) {
+    for (var i in this._clients) {
+      var client = this._clients[i];
+      if (client.name() == params.from_name) {
+        valid_session = (client.session() == params.session);
+        break;
+      }
+    }
+  }
   var emit_params = {
       action: params.action,
       from_name: params.from_name,
       msg: params.msg,
       from_lang: params.from_lang,
-      output_media: params.output_media
+      output_media: params.output_media,
+      session: params.session
   };
+  
+  if (!valid_session){
+    console.log('Invalid session. ' + JSON.stringify(emit_params, null, 2));
+    return;
+  }
+  
   this._clients.filter(function(v){return v !== undefined}).forEach(function(client){
     if (params.ignore_clients.indexOf(client) === -1){
       client.emit(emit_params); 
     }
   });
-}
+};
 
-module.exports = Clients
+module.exports = Clients;

@@ -5,7 +5,6 @@ exports.get = function(request, response){
 
   // Callbacks for the various request states 
   var on_data = function(chunk){
-    console.log(chunk.toString());
     response.write(chunk.toString());
   };
   var on_end = function(chunk){

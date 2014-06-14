@@ -81,7 +81,6 @@ if (!('webkitSpeechRecognition' in window)) {
       var list = langs[select_language.selectedIndex];
       var languageFrom = language_codes[select_language.selectedIndex];
       var languageTo = language_codes[to_language.selectedIndex];
-      console.log(languageFrom);
 
       jQuery.get("/requestTranslateToken", function(data){
         // Now do stuff with this!
@@ -93,7 +92,6 @@ if (!('webkitSpeechRecognition' in window)) {
           contentType: "text/plain"
         };
         jQuery.get("/translateText", translation_data, function(response_data){
-          console.log(response_data);
           jQuery("#translated_text").html(response_data);
           translation_data.text = jQuery("#translated_text string").html();
           audio_params = jQuery.param(translation_data);
