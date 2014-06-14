@@ -1,4 +1,5 @@
 $(function() {
+  var timeOut = 0;
   var FADE_TIME = 150; // ms
   var COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
@@ -195,6 +196,10 @@ $(function() {
     message = cleanInput(message);
     // if there is a non-empty message and a socket connection
     if (message && connected) {
+      if (recognizing) {
+        recognition.stop();
+        window.setTimeout(function() {recognition.start()}, 250);
+      }
       $inputMessage.val('');
       addChatMessage({
         from_name: username,
@@ -309,10 +314,6 @@ $(function() {
     if (event.which === 13) {
       if (username && language) {
         sendMessage();
-        if (recognizing) {
-           recognition.stop();
-           window.setTimeout(function() {recognition.start()}, 250);
-        }
       } else {
         setUsername();
       }
@@ -320,6 +321,9 @@ $(function() {
   });
 
   $inputMessage.on('input', function() {
+    if (recognizing) {
+      recognition.stop();
+    }
   });
 
   
@@ -419,6 +423,7 @@ $(function() {
     };
       
     recognition.onend = function() {
+      window.clearTimeout(timeOut);
       recognizing = false;
       if (!ignore_onend) {
         $microphone.attr('src', 'pics/mic.gif');
@@ -437,6 +442,10 @@ $(function() {
       }
       final_transcript = capitalize(final_transcript);
       $inputMessage.val(final_transcript);
+      if (timeOut !== 0) {
+         window.clearTimeout(timeOut);
+      }
+      timeOut = window.setTimeout(sendMessage, 1000);
     };
         
     var first_char = /\S/;
