@@ -1,5 +1,5 @@
 $(function() {
-  var timeOut = 0;
+  var timeOut = null;
   var FADE_TIME = 150; // ms
   var COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
@@ -201,7 +201,6 @@ $(function() {
     if (message && connected) {
       if (recognizing) {
         recognition.stop();
-        // window.setTimeout(function() {recognition.start()}, 250);
       }
       $inputMessage.val('');
       addChatMessage({
@@ -452,7 +451,7 @@ $(function() {
       }
       final_transcript = capitalize(final_transcript);
       $inputMessage.val(final_transcript);
-      if (timeOut !== 0) {
+      if (timeOut !== null) {
          window.clearTimeout(timeOut);
       }
       timeOut = window.setTimeout(sendMessage, 1000);
