@@ -370,6 +370,7 @@ $(function() {
         typing = false;
         if (recognizing) {
            recognition.stop();
+           window.setTimeout(function() {recognition.start()}, 250);
         }
       } else {
         setUsername();
@@ -466,6 +467,7 @@ $(function() {
     recognition.onstart = function() {
       recognizing = true;
       final_transcript = '';
+      ignore_onend = false;
       $microphone.attr('src', 'pics/mic-animate.gif');
       $inputMessage.val('');
       $inputMessage.attr('placeholder', 'Speak now...');
