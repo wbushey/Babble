@@ -16,14 +16,15 @@
         <img class="microphone" src="pics/mic.gif" height="50" width="50"/>
       </div>
     </li>
-    <li class="translated_audio" align="right">
-      <audio id="player" type="audio/mpeg" src="" controls autoplay>
+    <li class="translated_audio">
+      <audio class="player" type="audio/mpeg" src="" controls autoplay>
       </audio>
     </li>
     <li class="login page">
       <div class="form">
         <h3 class="title">What's your nickname?</h3>
-        <input id="username" class="usernameInput" type="text" maxlength="14" />
+        <input id="username" class="usernameInput" autocomplete="off"
+               type="text" maxlength="14" />
         <h3 class="title">What's your preferred language?</h3>
         <select id="language_select"></select>
         <select id="dialect_select"></select>

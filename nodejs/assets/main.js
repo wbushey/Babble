@@ -108,7 +108,7 @@ $(function() {
   
   var $loginPage = $('.login.page'); // The login page
   var $chatPage = $('.chat.page'); // The chatroom page
-  var $player = $('#player'); // The audio player
+  var $player = $('.player'); // The audio player
   $player.hide();
   var $language_select = $('#language_select');
   var $dialect_select = $('#dialect_select');
@@ -198,7 +198,7 @@ $(function() {
     if (message && connected) {
       if (recognizing) {
         recognition.stop();
-        window.setTimeout(function() {recognition.start()}, 250);
+        // window.setTimeout(function() {recognition.start()}, 250);
       }
       $inputMessage.val('');
       addChatMessage({

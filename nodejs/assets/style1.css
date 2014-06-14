@@ -161,6 +161,10 @@ ul {
   right: 20px;
   width: 50px;
 }
+.player {
+  float: right;
+  padding-right: 10px;
+}
 
 select {
   font-size: 150%;
