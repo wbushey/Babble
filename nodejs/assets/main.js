@@ -230,7 +230,7 @@ $(function() {
             appId : data.access_token,
             contentType: 'text/plain'
         };
-        audio_params = jQuery.param(translation_data);
+        var audio_params = jQuery.param(translation_data);
         $player.show();
         $player.attr('src', '/translateAudio?' + audio_params);
     });

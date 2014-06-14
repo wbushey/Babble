@@ -10,7 +10,9 @@
  *            for broadcasting a translated message to all of them.
  */
 
-var magic = require('../utils/getSecrets.js').magic;
+var secrets = require('../utils/getSecrets.js');
+var magic = secrets.getSecret('magic');
+
 var Clients = function(params){
   // Instance Variables
   this._name = "";

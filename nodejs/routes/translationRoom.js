@@ -2,8 +2,8 @@
 var SocketIO = require('socket.io');
 var Clients = require('../classes/clients');
 var Client = require('../classes/client');
-var sessionID = Math.random().toString().substr(2);
-var magic = require('../utils/getSecrets.js').magic;
+var secrets = require('../utils/getSecrets.js');
+var magic = secrets.getSecret('magic');
 
 function create(server){
   var io = new SocketIO(server);
@@ -79,7 +79,7 @@ function create(server){
           msg: socket.translation_client.name() + ' has left',
           from_lang: 'en',
           output_media: ['text'],
-          magic: magic     // magic number
+          magic: magic     // Verifies that message was sent by the server to prevent spoofing.
         };
         io.clients.broadcast(broadcast_params);
         io.clients.remove(socket.translation_client);
