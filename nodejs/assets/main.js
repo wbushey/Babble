@@ -97,8 +97,14 @@ $(function() {
   var $languageDropdown = $('#language_select');
   var $messages = $('.messages'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
+ 
+  // Speech recognition stuff
   var $microphone = $('.microphone'); // Microphone for audio input
-  var microphone_active = false;
+  var recognizing = false; // Microphone active; recognizing speech
+  var recognition;
+  var final_transcript;
+  var ignore_onend;
+  var start_timestamp;
   
   var $loginPage = $('.login.page'); // The login page
   var $chatPage = $('.chat.page'); // The chatroom page
@@ -120,6 +126,7 @@ $(function() {
   $language_select[0].selectedIndex = 7;
   $dialect_select[0].selectedIndex = 6;
   var dialect;
+  var final_transcript;
      
   // Prompt for setting a username
   var username;
@@ -161,10 +168,13 @@ $(function() {
       if (typeof dialect == 'object'){
         dialect = $dialect_select.val();
       }
-      if (dialect == '') {
+
+      if ((dialect == '') || !('webkitSpeechRecognition' in window)){
         console.log("Hide the microphone");
         $microphone.hide();
-      };
+      } else {
+        createRecognition();
+      }
       console.log('dialect = ', dialect);
       connected = true;
       $loginPage.fadeOut();
@@ -358,6 +368,9 @@ $(function() {
         sendMessage();
         socket.emit('stop typing');
         typing = false;
+        if (recognizing) {
+           recognition.stop();
+        }
       } else {
         setUsername();
       }
@@ -382,12 +395,10 @@ $(function() {
   });
 
   $microphone.on('click', function() {
-    if (microphone_active) {
-       $microphone.attr('src', 'pics/mic.gif');
-       microphone_active = false;
+    if (recognizing) {
+       recognition.stop();
     } else {
-       $microphone.attr('src', 'pics/mic-animate.gif');
-       microphone_active = true;
+       recognition.start();
     }     
   });
   
@@ -445,4 +456,68 @@ $(function() {
   socket.on('stop typing', function (data) {
     removeChatTyping(data);
   });
+  
+  // Speech recognition code
+  function createRecognition() {
+    recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onstart = function() {
+      recognizing = true;
+      final_transcript = '';
+      $microphone.attr('src', 'pics/mic-animate.gif');
+      $inputMessage.val('');
+      $inputMessage.attr('placeholder', 'Speak now...');
+      $inputMessage.focus();
+    };
+        
+    recognition.onerror = function(event) {
+      if (event.error == 'no-speech') {
+        $microphone.attr('src', 'pics/mic.gif');
+        log('No speech');
+        ignore_onend = true;
+      }
+      if (event.error == 'audio-capture') {
+        $microphone.attr('src', 'pics/mic.gif');
+        log('No microphone');
+        ignore_onend = true;
+      }
+      if (event.error == 'not-allowed') {
+        if (event.timeStamp - start_timestamp < 100) {
+          log('Blocked');
+        } else {
+          log('Denied');
+        }
+        ignore_onend = true;
+      }
+    };
+      
+    recognition.onend = function() {
+      recognizing = false;
+      if (!ignore_onend) {
+        $microphone.attr('src', 'pics/mic.gif');
+      }
+      $inputMessage.attr('placeholder', '');
+    };
+        
+    recognition.onresult = function(event) {
+      var interim_transcript = '';
+      for (var i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          final_transcript += event.results[i][0].transcript;
+        } else {
+          interim_transcript += event.results[i][0].transcript;
+        }
+      }
+      final_transcript = capitalize(final_transcript);
+      $inputMessage.val(final_transcript);
+    };
+        
+    var first_char = /\S/;
+    function capitalize(s) {
+      return s.replace(first_char, function(m) { 
+        return m.toUpperCase(); });
+    };
+  };  
 });
