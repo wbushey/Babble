@@ -50,7 +50,10 @@ function create(server){
         data = JSON.parse(data);
 
       var speaking_client = socket.translation_client;
-
+      if (typeof speaking_client == 'undefined') {
+         return;
+      }
+      
       var broadcast_params = {
         action: 'new message',
         from_name: speaking_client.name(),
