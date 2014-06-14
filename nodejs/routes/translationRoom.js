@@ -85,6 +85,19 @@ function create(server){
         io.clients.remove(socket.translation_client);
       }
     });
+    
+    /**
+     * Action issued when a client requests the list of client names.
+     *
+     * @event client names
+     */
+    socket.on('client names', function(data){
+      var client = socket.translation_client;
+      if (client){
+        var client_names = '' + io.clients.client_names();
+        client.socket().emit('client names', client_names);
+      }
+    });
   });
 
   return io;

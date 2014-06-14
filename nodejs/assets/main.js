@@ -188,6 +188,7 @@ $(function() {
                          from_lang: language, 
                          output_media: media};
       socket.emit('join', join_params);
+      socket.emit('client names');
     }
   }
 
@@ -387,6 +388,11 @@ $(function() {
       $currentInput = $usernameInput.focus();
       connected = false;
       username = '';
+  });
+  
+  // Whenever the server emits 'client names', log it in the chat body
+  socket.on('client names', function (data) {
+    log('Users: ' + data);
   });
   
   // Speech recognition code

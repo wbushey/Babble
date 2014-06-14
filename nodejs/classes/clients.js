@@ -44,6 +44,15 @@ Clients.prototype.name = function(new_name){
 };
 
 /**
+ * Return the list of client names.
+ * @method client_names
+ * @returns {Object} List of client names
+ */
+Clients.prototype.client_names = function(){
+  return this._client_names;
+}
+
+/**
  * Adds a new client to the room.
  *
  * @method insert
