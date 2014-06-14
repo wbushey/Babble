@@ -1,6 +1,6 @@
 $(function() {
   var FADE_TIME = 150; // ms
-  var TYPING_TIMER_LENGTH = 400; // ms
+  // var TYPING_TIMER_LENGTH = 400; // ms
   var COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
     '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
@@ -131,8 +131,6 @@ $(function() {
   // Prompt for setting a username
   var username;
   var connected = false;
-  var typing = false;
-  var lastTypingTime;
   var $currentInput = $usernameInput.focus();
 
   var socket = io();
@@ -235,13 +233,6 @@ $(function() {
     if (typeof data === 'string')
         data = JSON.parse(data);
  
-    // Don't fade the message in if there is an 'X was typing'
-    var $typingMessages = getTypingMessages(data);
-    options = options || {};
-    if ($typingMessages.length !== 0) {
-      options.fade = false;
-      $typingMessages.remove();
-    };
     var colorStyle = 'style="color:' + getUsernameColor(data.from_name) + '"';
     var usernameDiv = '<span class="username"' + colorStyle + '>' +
       cleanInput(data.from_name) + '</span>';
@@ -253,8 +244,8 @@ $(function() {
                        data.orig_text + '</span>';
     }
     
-    var typingClass = data.typing ? 'typing' : '';
-    var messageDiv = '<li class="message ' + typingClass + '">' +
+    // var typingClass = data.typing ? 'typing' : '';
+    var messageDiv = '<li class="message ' + '">' +
         usernameDiv + messageBodyDiv + originalText + '</li>';
     var $messageDiv = $(messageDiv).data('username', data.from_name);
     addMessageElement($messageDiv, options);
@@ -265,25 +256,6 @@ $(function() {
     }
   }
 
-  // Adds the visual chat typing message
-  function addChatTyping (data) {
-    data.typing = true;
-    data.text = 'is typing';
-    addChatMessage(data);
-  }
-
-  // Removes the visual chat typing message
-  function removeChatTyping (data) {
-    getTypingMessages(data).fadeOut(function () {
-      $(this).remove();
-    });
-  }
-
-  // Adds a message element to the messages and scrolls to the bottom
-  // el - The element to add as a message
-  // options.fade - If the element should fade-in (default = true)
-  // options.prepend - If the element should prepend
-  //   all other messages (default = false)
   function addMessageElement (el, options) {
     var $el = $(el);
 
@@ -315,33 +287,6 @@ $(function() {
     return $('<div/>').text(input).html() || input;
   }
 
-  // Updates the typing event
-  function updateTyping () {
-    if (connected) {
-      if (!typing) {
-        typing = true;
-        socket.emit('typing');
-      }
-      lastTypingTime = (new Date()).getTime();
-
-      setTimeout(function () {
-        var typingTimer = (new Date()).getTime();
-        var timeDiff = typingTimer - lastTypingTime;
-        if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
-          socket.emit('stop typing');
-          typing = false;
-        }
-      }, TYPING_TIMER_LENGTH);
-    }
-  }
-
-  // Gets the 'X is typing' messages of a user
-  function getTypingMessages (data) {
-    return $('.typing.message').filter(function (i) {
-      return $(this).data('from_name') === data.from_name;
-    });
-  }
-
   // Gets the color of a username through our hash function
   function getUsernameColor (username) {
 
@@ -366,8 +311,6 @@ $(function() {
     if (event.which === 13) {
       if (username && language) {
         sendMessage();
-        socket.emit('stop typing');
-        typing = false;
         if (recognizing) {
            recognition.stop();
            window.setTimeout(function() {recognition.start()}, 250);
@@ -379,16 +322,11 @@ $(function() {
   });
 
   $inputMessage.on('input', function() {
-    updateTyping();
+  //  updateTyping();
   });
 
   
   // Click events
-
-  // Focus input when clicking anywhere on login page
-  $loginPage.click(function () {
-    // $currentInput.focus();
-  });
 
   // Focus input when clicking on the message input's border
   $inputMessage.click(function () {
@@ -435,8 +373,6 @@ $(function() {
   socket.on('leave', function (data) {
     data = JSON.parse(data);
     log(data.text);
-    addParticipantsMessage(data);
-    removeChatTyping(data);
   });
   
   // Whenever the server emits 'refused', disconnect
@@ -446,16 +382,6 @@ $(function() {
       $currentInput = $usernameInput.focus();
       connected = false;
       username = '';
-  });
-
-  // Whenever the server emits 'typing', show the typing message
-  socket.on('typing', function (data) {
-    addChatTyping(data);
-  });
-
-  // Whenever the server emits 'stop typing', kill the typing message
-  socket.on('stop typing', function (data) {
-    removeChatTyping(data);
   });
   
   // Speech recognition code
