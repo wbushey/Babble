@@ -1,6 +1,5 @@
 $(function() {
   var FADE_TIME = 150; // ms
-  // var TYPING_TIMER_LENGTH = 400; // ms
   var COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
     '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
@@ -244,7 +243,6 @@ $(function() {
                        data.orig_text + '</span>';
     }
     
-    // var typingClass = data.typing ? 'typing' : '';
     var messageDiv = '<li class="message ' + '">' +
         usernameDiv + messageBodyDiv + originalText + '</li>';
     var $messageDiv = $(messageDiv).data('username', data.from_name);
@@ -322,7 +320,6 @@ $(function() {
   });
 
   $inputMessage.on('input', function() {
-  //  updateTyping();
   });
 
   
