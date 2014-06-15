@@ -97,9 +97,40 @@ function create(server){
     socket.on('client names', function(data){
       var client = socket.translation_client;
       if (client){
-        var client_names = '' + io.clients.client_names().filter(function(x){return x});
+        var client_names = '' + io.clients.client_names().filter(function(x){return x;});
         client.socket().emit('client names', client_names);
       }
+    });
+    
+    socket.on('private message', function(data){
+      var speaking_client = socket.translation_client;
+      if (!speaking_client) {
+        console.log('No speaking client');
+        return;
+      }
+      var idx = io.clients.client_names().indexOf(data.to);
+        
+      if (idx == -1) {
+        console.log('Recipient not found');
+        return;
+      }
+      var receiving_client = io.clients._clients[idx];
+        
+      if (data.session != speaking_client.session()) {
+        console.log('Invalid session ID');
+        return;
+      }
+        
+      var emit_params = {
+        action: 'private message',
+        from_name: speaking_client.name(),
+        msg: data.msg,
+        from_lang: speaking_client.from_lang(),
+        output_media: speaking_client.output_media(),
+        session: receiving_client.session()
+      };
+        
+      receiving_client.emit(emit_params);
     });
   });
 

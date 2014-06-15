@@ -49,6 +49,11 @@ ul {
 
 /* Login Page */
 
+.error {
+  color: red;
+  visibility: hidden;
+}
+
 .login.page {
   background-color: #000;
 }

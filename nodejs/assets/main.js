@@ -100,7 +100,11 @@ $(function() {
   var $inputMessage = $('.inputMessage'); // Input message input box
   var socket = io();
   var media;
- 
+  var username_regex = /^[a-zA-Z0-9_]*$/;
+  var msg_regex = /^\/msg\s(\S+?)\s(.+)/;
+  var match_obj;
+  var client_names;
+  
   // Speech recognition stuff
   var $microphone = $('.microphone'); // Microphone for audio input
   var recognizing = false; // Microphone active; recognizing speech
@@ -153,6 +157,13 @@ $(function() {
   // Sets the client's username
   function setUsername () {
     username = cleanInput($usernameInput.val().trim());
+    if (!username.match(username_regex)){
+      $('.invalid_nick').css('visibility', 'visible');
+      username = '';
+      $usernameInput.val('');
+    } else {
+      $('.invalid_nick').css('visibility', 'hidden');
+    }
     if (username) {
       language_index = $languageDropdown.val();
       language = langs[language_index][1];
@@ -193,26 +204,40 @@ $(function() {
       addChatMessage(data);
     });
 
+    // Whenever the server emits 'private message', update the chat body
+    socket.on('private message', function (data) {
+      addChatMessage(data);
+    });
+    
     // Whenever the server emits 'join', log it in the chat body
     socket.on('join', function (data) {
       data = JSON.parse(data);
-      if (data.orig_text != username + ' has joined') {
+      var other_user = data.orig_text.split(' ')[0];
+      if (other_user != username) {
         log(data.text);
+        client_names.push(data.split(' ')[0]);
       }
     });
 
     // Whenever the server emits 'leave', log it in the chat body
     socket.on('leave', function (data) {
       data = JSON.parse(data);
+      var other_user = data.orig_text.split(' ')[0];
       log(data.text);
+      var idx = client_names.indexOf(other_user);
+      if (idx != -1){
+        delete client_names[idx]; 
+      }
     });
   
-    // Whenever the server emits 'refused', disconnect
-    socket.on('refused', restart);
+    socket.on('refused', function (data) {
+      log('Nickname in use. Please choose another.');
+      log('Type /quit or reload the page');
+    });
   
-    // Whenever the server emits 'client names', log it in the chat body
+    // Whenever the server emits 'client names', save the list in client_names
     socket.on('client names', function (data) {
-      log('Users: ' + data);
+      client_names = data.split(',');   
     });
 
     $loginPage.fadeOut();
@@ -230,15 +255,26 @@ $(function() {
                        output_media: media};
     
     socket.emit('join', join_params);
-    socket.emit('client names');
+    listUsers();
   }
   
-  //
   function restart() {
     socket.disconnect();
     location.reload();
   }
 
+  function listUsers() {
+    socket.emit('client names');
+    setTimeout(function() {return log('Users: ' + client_names);}, 250);
+  }
+  
+  // Send a private message
+  function privateMessage(recipient, message){
+    var emit_params = {to: recipient, msg: message, session: sessionID};
+    socket.emit('private message', emit_params);
+    console.log('private message: ' + JSON.stringify(emit_params));      
+  }
+  
   // Sends a chat message
   function sendMessage () {
     var message = $inputMessage.val();
@@ -249,10 +285,16 @@ $(function() {
     
     // Check for user commands
     if (message.substr(0,1) == '/'){
-      if (message == '/list')
-        socket.emit('client names');
-      if (message == '/quit'){
+      if (message == '/list') {
+        
+      } else if (message == '/quit'){
         restart();
+      } else {
+        match_obj = message.match(msg_regex);
+        if (match_obj){
+          log(' Sending "' + match_obj[2] +'" to ' + match_obj[1]);
+          privateMessage(match_obj[1], match_obj[2]);
+        }
       }
       return;
     }
