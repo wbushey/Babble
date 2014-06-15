@@ -104,6 +104,8 @@ $(function() {
   var msg_regex = /^\/msg\s(\S+?)\s(.+)/;
   var match_obj;
   var client_names;
+  var ignore_list = [];
+  var query_list = [];
   
   // Speech recognition stuff
   var $microphone = $('.microphone'); // Microphone for audio input
@@ -189,16 +191,6 @@ $(function() {
     
     // Socket events
 
-    // Whenever the server emits 'login', log the login message
-    socket.on('login', function (data) {
-
-      // Display the welcome message
-      var message = "Welcome to Socket.IO Chat &mdash; ";
-      log(message, {
-        prepend: true
-      });
-    });
-
     // Whenever the server emits 'new message', update the chat body
     socket.on('new message', function (data) {
       addChatMessage(data);
@@ -206,7 +198,7 @@ $(function() {
 
     // Whenever the server emits 'private message', update the chat body
     socket.on('private message', function (data) {
-      addChatMessage(data);
+      addChatMessage(data, {type: 'private'});
     });
     
     // Whenever the server emits 'join', log it in the chat body
@@ -261,6 +253,7 @@ $(function() {
   // User Commands
   function userCommands(msg) {
     var tokens = msg.split(' ');
+    var i;
     switch (tokens[0]) {
       case '/quit':
         restart();
@@ -273,8 +266,29 @@ $(function() {
         var message = tokens.slice(2).join(' ');
         privateMessage(recipient, message);
         break;
+      case '/ignore':
+        if (tokens.length == 1){
+          log('Ignore list: ' + ignore_list.filter(function(u) {return u !== undefined;}).join(', '));
+        } else {
+          for (i=1; i<tokens.length; i++)
+            ignoreUser(tokens[i]);
+          log('Ignoring ' + tokens.slice(1).join(', '));
+        }
+        break;
+      case '/unignore':
+        if (tokens.length == 1){
+          log('Clearing unignore list');
+          ignore_list = [];
+        } else {
+          for (i=1; i<tokens.length; i++)
+            unignoreUser(tokens[i]);
+        }
+        break;
+      case '/query':
+        query_list = tokens.slice(1);
+        break;
       default:
-        console.log('Command not recognized');
+        log('Command not recognized');
     }
   }
   
@@ -287,15 +301,36 @@ $(function() {
   // Retrieve client list and log it in the chat body
   function listUsers() {
     socket.emit('client names');
-    setTimeout(function() {return log('Users: ' + client_names);}, 250);
+    setTimeout(function() {return log('Users: ' + client_names.join(' '));}, 250);
   }
   
+  // Ignore user
+  function ignoreUser(user) {
+    if (ignore_list.indexOf(user) == -1) {
+      ignore_list.push(user);
+    }
+  }
   
+  // Unignore user
+  function unignoreUser(user) {
+    var idx = ignore_list.indexOf(user);
+    if (idx != -1) {
+      delete ignore_list[idx];
+      log('Unignoring ' + user);
+    }
+  }
   // Send a private message
-  function privateMessage(recipient, message){
-    var emit_params = {to: recipient, msg: message, session: sessionID};
-    socket.emit('private message', emit_params);
-    console.log('private message: ' + JSON.stringify(emit_params));      
+  function privateMessage(recipients, message){
+    addChatMessage({from_name: username, text: message}, {type: 'private'});
+    if (typeof recipients === 'string') {
+      recipients = [recipients];
+    }
+    recipients.forEach(function(recipient){
+      if (typeof recipient !== 'undefined'  && ignore_list.indexOf(recipient) == -1) {
+        var emit_params = {to: recipient, msg: message, session: sessionID};
+        socket.emit('private message', emit_params);
+      }
+    });
   }
   
   // Send a chat message
@@ -316,6 +351,11 @@ $(function() {
       if (recognizing) {
         recognition.stop();
       }
+      if (query_list.length > 0) {
+        privateMessage(query_list, message);
+        return;
+      }
+      
       addChatMessage({
         from_name: username,
         text: message
@@ -351,23 +391,29 @@ $(function() {
   
   // Adds the visual chat message to the message list
   function addChatMessage (data, options) {
-    if (typeof data === 'string')
+    if (typeof data === 'string'){
       data = JSON.parse(data);
+    }
+    
+    if (ignore_list.indexOf(data.from_name) != -1)
+      return;
     
     var colorStyle = 'style="color:' + getUsernameColor(data.from_name) + '"';
     var usernameDiv = '<span class="username"' + colorStyle + '>' +
       cleanInput(data.from_name) + '</span>';
     var text = cleanInput(data.text);
     var messageBodyDiv = '<span class="messageBody">' + text + '</span>';
+    
     var originalText = '';
     if (data.orig_text && data.orig_text != text) {
         originalText = '&nbsp;&nbsp;<span class="originalText">' +
                        data.orig_text + '</span>';
     }
-    
+
     var messageDiv = '<li class="message ' + '">' +
         usernameDiv + messageBodyDiv + originalText + '</li>';
     var $messageDiv = $(messageDiv).data('username', data.from_name);
+    
     addMessageElement($messageDiv, options);
     
     // Insert audio
@@ -389,7 +435,9 @@ $(function() {
     if (typeof options.prepend === 'undefined') {
       options.prepend = false;
     }
-
+    if (typeof options.type === 'undefined') {
+      options.type = 'public';
+    }
     // Apply options
     if (options.fade) {
       $el.hide().fadeIn(FADE_TIME);
@@ -399,6 +447,10 @@ $(function() {
     } else {
       $messages.append($el);
     }
+    if (options.type == 'private'){
+      $el.css('font-style', 'italic');
+    }
+    
     $messages[0].scrollTop = $messages[0].scrollHeight;
   }
 
