@@ -236,7 +236,7 @@ $(function() {
     $chatPage.show();
     $loginPage.off('click');
     $currentInput = $inputMessage.focus();
-    log("Welcome to Babble");
+    log("Welcome to Babble. Type /help for help.");
       
     // Tell the server your username
     sessionID = Math.random().toString().substr(2);
