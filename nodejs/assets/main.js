@@ -286,6 +286,11 @@ $(function() {
         break;
       case '/query':
         query_list = tokens.slice(1);
+        if (query_list.length > 0) {
+          log('Private chat with ' + query_list.join(', '));
+        } else {
+          log('Public chat');
+        }
         break;
       case '/help':
         help(tokens[1]);
@@ -328,10 +333,15 @@ $(function() {
     if (typeof recipients === 'string') {
       recipients = [recipients];
     }
+    var seen = {}
+    seen[username] = true;
     recipients.forEach(function(recipient){
-      if (typeof recipient !== 'undefined'  && ignore_list.indexOf(recipient) == -1) {
-        var emit_params = {to: recipient, msg: message, session: sessionID};
-        socket.emit('private message', emit_params);
+      if (!seen[recipient]) {
+        seen[recipient] = true;
+        if (typeof recipient !== 'undefined'  && ignore_list.indexOf(recipient) == -1) {
+          var emit_params = {to: recipient, msg: message, session: sessionID};
+          socket.emit('private message', emit_params);
+        }
       }
     });
   }
@@ -409,9 +419,8 @@ $(function() {
       default:
         help();
     }
-  }
-
-        
+  } 
+    
   // Log a message
   function log (message, options) {
     var el = '<li class="log">' + message + '</li>';
