@@ -258,7 +258,7 @@ $(function() {
       case '/quit':
         restart();
         break;
-      case '/list':
+      case '/users':
         listUsers();
         break;
       case '/msg':
@@ -287,8 +287,11 @@ $(function() {
       case '/query':
         query_list = tokens.slice(1);
         break;
+      case '/help':
+        help(tokens[1]);
+        break;
       default:
-        log('Command not recognized');
+        help();
     }
   }
   
@@ -367,6 +370,48 @@ $(function() {
     }
   }
 
+  // Display help information
+  function help (cmd) {
+    if (typeof cmd == 'undefined') {
+      cmd = 'help';
+    }
+    if (cmd.substr(0,1) == '/')
+      cmd = cmd.substr(1);
+    
+    switch (cmd) {
+      case 'help':
+        log('Type /help [cmd] to get help on a specific command.');
+        log('Commands: help, ignore, msg, query, quit, unignore, users');
+        break;
+      case 'ignore':
+        log('Type /ignore [user] to ignore all messages from a user.');
+        log('To ignore multiple users, type /ignore [user1] [user2] [user3]');
+        break;
+      case 'msg':
+        log('Type /msg [user] [text] to send a private message to a user.');
+        break;
+      case 'query':
+        log('Type /query [user] to begin a private chat with a user.');
+        log('To chat with multiple users, type /query [user1] [user2] [user3]');
+        log('To return to public chat, type /query with no arguments.');
+        break;
+      case 'quit':
+        log('Type /quit to disconnect and restart the application.');
+        break;
+      case 'unignore':
+        log('Type /unignore [user] to remove a user from the ignore list.');
+        log('To remove multiple users, type /ignore [user1] [user2] [user3]');
+        log('To remove all users, type /ignore with no arguments.');
+        break;
+      case 'users':
+        log('Type /users to display the list of users.');
+        break;
+      default:
+        help();
+    }
+  }
+
+        
   // Log a message
   function log (message, options) {
     var el = '<li class="log">' + message + '</li>';
