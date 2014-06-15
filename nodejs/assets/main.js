@@ -268,7 +268,12 @@ $(function() {
         break;
       case '/ignore':
         if (tokens.length == 1){
-          log('Ignore list: ' + ignore_list.filter(function(u) {return u !== undefined;}).join(', '));
+          var ignore_string = ignore_list.filter(function(u) {return u !== undefined;}).join(', ');
+          if (ignore_string.length > 0) {
+            log('Ignore list: ' + ignore_string);
+          } else {
+            log('Ignore list is empty');
+          }
         } else {
           for (i=1; i<tokens.length; i++)
             ignoreUser(tokens[i]);
@@ -342,7 +347,7 @@ $(function() {
           var emit_params = {to: recipient, msg: message, session: sessionID};
           socket.emit('private message', emit_params);
         }
-      }
+      } 
     });
   }
   
