@@ -92,12 +92,14 @@ $(function() {
       ['日本語 (Japanese)', 'ja', true, 'ja-JP']];
  
   // Initialize varibles
-  var sessionID = Math.random().toString().substr(2);
+  var sessionID;
   var $window = $(window);
   var $usernameInput = $('#username'); // Input for username
   var $languageDropdown = $('#language_select');
   var $messages = $('.messages'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
+  var socket = io();
+  var media;
  
   // Speech recognition stuff
   var $microphone = $('.microphone'); // Microphone for audio input
@@ -132,13 +134,7 @@ $(function() {
      
   // Prompt for setting a username
   var username;
-  var connected = false;
   var $currentInput = $usernameInput.focus();
-
-  var socket = io();
-
-  function addParticipantsMessage (data) {
-  }
  
   function setDialects(dialects) {
      if (typeof dialects === 'object') {
@@ -160,7 +156,7 @@ $(function() {
     if (username) {
       language_index = $languageDropdown.val();
       language = langs[language_index][1];
-      var media = ['text'];
+      media = ['text'];
       if (langs[language_index][2]) {
         media = ['text', 'audio'];
       }
@@ -174,35 +170,98 @@ $(function() {
       } else {
         createRecognition();
       }
-      connected = true;
-      $loginPage.fadeOut();
-      $chatPage.show();
-      $loginPage.off('click');
-      $currentInput = $inputMessage.focus();
-      log("Welcome to Babble");
-      
-      // Tell the server your username
-      var join_params = {name: username,
-                         session: sessionID,
-                         to_lang: language, 
-                         from_lang: language, 
-                         output_media: media};
-      socket.emit('join', join_params);
-      socket.emit('client names');
+      connect();
     }
+  }
+  
+  function connect(){
+    
+    // Socket events
+
+    // Whenever the server emits 'login', log the login message
+    socket.on('login', function (data) {
+
+      // Display the welcome message
+      var message = "Welcome to Socket.IO Chat &mdash; ";
+      log(message, {
+        prepend: true
+      });
+    });
+
+    // Whenever the server emits 'new message', update the chat body
+    socket.on('new message', function (data) {
+      addChatMessage(data);
+    });
+
+    // Whenever the server emits 'join', log it in the chat body
+    socket.on('join', function (data) {
+      data = JSON.parse(data);
+      if (data.orig_text != username + ' has joined') {
+        log(data.text);
+      }
+    });
+
+    // Whenever the server emits 'leave', log it in the chat body
+    socket.on('leave', function (data) {
+      data = JSON.parse(data);
+      log(data.text);
+    });
+  
+    // Whenever the server emits 'refused', disconnect
+    socket.on('refused', restart);
+  
+    // Whenever the server emits 'client names', log it in the chat body
+    socket.on('client names', function (data) {
+      log('Users: ' + data);
+    });
+
+    $loginPage.fadeOut();
+    $chatPage.show();
+    $loginPage.off('click');
+    $currentInput = $inputMessage.focus();
+    log("Welcome to Babble");
+      
+    // Tell the server your username
+    sessionID = Math.random().toString().substr(2);
+    var join_params = {name: username,
+                       session: sessionID,
+                       to_lang: language, 
+                       from_lang: language, 
+                       output_media: media};
+    
+    socket.emit('join', join_params);
+    socket.emit('client names');
+  }
+  
+  //
+  function restart() {
+    socket.disconnect();
+    location.reload();
   }
 
   // Sends a chat message
   function sendMessage () {
     var message = $inputMessage.val();
+    $inputMessage.val('');
+    
     // Prevent markup from being injected into the message
     message = cleanInput(message);
+    
+    // Check for user commands
+    if (message.substr(0,1) == '/'){
+      if (message == '/list')
+        socket.emit('client names');
+      if (message == '/quit'){
+        restart();
+      }
+      return;
+    }
+    
     // if there is a non-empty message and a socket connection
-    if (message && connected) {
+    if (message) {
       if (recognizing) {
         recognition.stop();
       }
-      $inputMessage.val('');
       addChatMessage({
         from_name: username,
         text: message
@@ -239,8 +298,8 @@ $(function() {
   // Adds the visual chat message to the message list
   function addChatMessage (data, options) {
     if (typeof data === 'string')
-        data = JSON.parse(data);
- 
+      data = JSON.parse(data);
+    
     var colorStyle = 'style="color:' + getUsernameColor(data.from_name) + '"';
     var usernameDiv = '<span class="username"' + colorStyle + '>' +
       cleanInput(data.from_name) + '</span>';
@@ -347,52 +406,7 @@ $(function() {
   });
   
   
-  // Socket events
 
-  // Whenever the server emits 'login', log the login message
-  socket.on('login', function (data) {
-    connected = true;
-    // Display the welcome message
-    var message = "Welcome to Socket.IO Chat &mdash; ";
-    log(message, {
-      prepend: true
-    });
-    addParticipantsMessage(data);
-  });
-
-  // Whenever the server emits 'new message', update the chat body
-  socket.on('new message', function (data) {
-    addChatMessage(data);
-  });
-
-  // Whenever the server emits 'join', log it in the chat body
-  socket.on('join', function (data) {
-    data = JSON.parse(data);
-    if (data.orig_text != username + ' has joined') {
-        log(data.text);
-        addParticipantsMessage(data);
-    }
-  });
-
-  // Whenever the server emits 'leave', log it in the chat body
-  socket.on('leave', function (data) {
-    data = JSON.parse(data);
-    log(data.text);
-  });
-  
-  // Whenever the server emits 'refused', disconnect
-  socket.on('refused', function (data) {
-      $loginPage.fadeIn();
-      $chatPage.hide();
-      $currentInput = $usernameInput.focus();
-      connected = false;
-      username = '';
-  });
-  
-  // Whenever the server emits 'client names', log it in the chat body
-  socket.on('client names', function (data) {
-    log('Users: ' + data);
-  });
   
   // Speech recognition code
   function createRecognition() {

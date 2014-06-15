@@ -73,6 +73,7 @@ function create(server){
      * @event disconnect
      */
     socket.on('disconnect', function(data){
+      console.log('disconnect received');
       if (socket.translation_client){
         var broadcast_params = {
           action: 'leave',
@@ -83,6 +84,8 @@ function create(server){
         };
         io.clients.broadcast(broadcast_params);
         io.clients.remove(socket.translation_client);
+      } else {
+        console.log('No translation client'); 
       }
     });
     
@@ -94,7 +97,7 @@ function create(server){
     socket.on('client names', function(data){
       var client = socket.translation_client;
       if (client){
-        var client_names = '' + io.clients.client_names();
+        var client_names = '' + io.clients.client_names().filter(function(x){return x});
         client.socket().emit('client names', client_names);
       }
     });
