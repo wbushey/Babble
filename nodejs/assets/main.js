@@ -215,7 +215,7 @@ $(function() {
       var other_user = data.orig_text.split(' ')[0];
       if (other_user != username) {
         log(data.text);
-        client_names.push(data.split(' ')[0]);
+        client_names.push(other_user);
       }
     });
 
@@ -258,15 +258,38 @@ $(function() {
     listUsers();
   }
   
+  // User Commands
+  function userCommands(msg) {
+    var tokens = msg.split(' ');
+    switch (tokens[0]) {
+      case '/quit':
+        restart();
+        break;
+      case '/list':
+        listUsers();
+        break;
+      case '/msg':
+        var recipient = tokens[1];
+        var message = tokens.slice(2).join(' ');
+        privateMessage(recipient, message);
+        break;
+      default:
+        console.log('Command not recognized');
+    }
+  }
+  
+  // Logout and restart chat application
   function restart() {
     socket.disconnect();
     location.reload();
   }
 
+  // Retrieve client list and log it in the chat body
   function listUsers() {
     socket.emit('client names');
     setTimeout(function() {return log('Users: ' + client_names);}, 250);
   }
+  
   
   // Send a private message
   function privateMessage(recipient, message){
@@ -275,7 +298,7 @@ $(function() {
     console.log('private message: ' + JSON.stringify(emit_params));      
   }
   
-  // Sends a chat message
+  // Send a chat message
   function sendMessage () {
     var message = $inputMessage.val();
     $inputMessage.val('');
@@ -283,24 +306,13 @@ $(function() {
     // Prevent markup from being injected into the message
     message = cleanInput(message);
     
-    // Check for user commands
-    if (message.substr(0,1) == '/'){
-      if (message == '/list') {
-        
-      } else if (message == '/quit'){
-        restart();
-      } else {
-        match_obj = message.match(msg_regex);
-        if (match_obj){
-          log(' Sending "' + match_obj[2] +'" to ' + match_obj[1]);
-          privateMessage(match_obj[1], match_obj[2]);
-        }
-      }
-      return;
-    }
-    
     // if there is a non-empty message and a socket connection
     if (message) {
+      // Check for user commands
+      if (message.substr(0,1) == '/') {
+        userCommands(message);
+        return;
+      }
       if (recognizing) {
         recognition.stop();
       }
