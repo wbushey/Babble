@@ -106,6 +106,7 @@ $(function() {
   var client_names;
   var ignore_list = [];
   var query_list = [];
+  var channel = 'public';
   
   // Speech recognition stuff
   var $microphone = $('.microphone'); // Microphone for audio input
@@ -232,6 +233,11 @@ $(function() {
       client_names = data.split(',');   
     });
 
+    // Whenever the server emits 'error', log it in the chat body
+    socket.on('error', function (data) {
+      log('Error: ' + data, {error: true});
+    });
+    
     $loginPage.fadeOut();
     $chatPage.show();
     $loginPage.off('click');
@@ -264,7 +270,7 @@ $(function() {
       case '/msg':
         var recipient = tokens[1];
         var message = tokens.slice(2).join(' ');
-        privateMessage(recipient, message);
+        sendPrivateMessage(recipient, message);
         break;
       case '/ignore':
         if (tokens.length == 1){
@@ -279,6 +285,9 @@ $(function() {
             ignoreUser(tokens[i]);
           log('Ignoring ' + tokens.slice(1).join(', '));
         }
+        break;
+      case '/join':
+        joinChannels(tokens.slice(1));
         break;
       case '/unignore':
         if (tokens.length == 1){
@@ -332,25 +341,36 @@ $(function() {
       log('Unignoring ' + user);
     }
   }
+  
   // Send a private message
-  function privateMessage(recipients, message){
+  function sendPrivateMessage(recipients, message){
     addChatMessage({from_name: username, text: message}, {type: 'private'});
-    if (typeof recipients === 'string') {
-      recipients = [recipients];
-    }
-    var seen = {}
-    seen[username] = true;
-    recipients.forEach(function(recipient){
-      if (!seen[recipient]) {
-        seen[recipient] = true;
-        if (typeof recipient !== 'undefined'  && ignore_list.indexOf(recipient) == -1) {
-          var emit_params = {to: recipient, msg: message, session: sessionID};
-          socket.emit('private message', emit_params);
-        }
-      } 
-    });
+    var emit_params = {to: '' + recipients, msg: message, session: sessionID};
+    socket.emit('private message', emit_params);
   }
   
+  // Join channels
+  function joinChannels(channels){
+    if (channels.length === 0) {
+      log('Current channel is ' + channel);
+    } else {
+      socket.emit('join channels', {channels: '' + channels});
+      channel = channels[0];
+      if (channels.length == 1) {
+        log('Joining channel ' + channel);
+      } else {
+        log('Joining channels ' + channels.join(', '));
+      }
+    }
+  }
+  
+  // Part channels
+  function partChannels(channels){
+    if (channels.length === 0)
+      channels = 'channel';
+    socket.emit('part channel', {channels: '' + channels});
+  }
+    
   // Send a chat message
   function sendMessage () {
     var message = $inputMessage.val();
@@ -370,17 +390,18 @@ $(function() {
         recognition.stop();
       }
       if (query_list.length > 0) {
-        privateMessage(query_list, message);
+        sendPrivateMessage(query_list, message);
         return;
       }
       
       addChatMessage({
         from_name: username,
-        text: message
+        text: message,
+        channel: channel
       });
       // tell server to execute 'new message' and send along one parameter
       var message_params = {msg: message, text: message, from_lang: language,
-                            session: sessionID};
+                            session: sessionID, channel: channel};
       socket.emit('new message', message_params);
     }
   }
@@ -402,8 +423,17 @@ $(function() {
         log('Type /ignore [user] to ignore all messages from a user.');
         log('To ignore multiple users, type /ignore [user1] [user2] [user3]');
         break;
+      case 'join':
+        log('Type /join #channel to join a channel.');
+        log('To list current channel, type /join wth no arguments.');
+        break;
       case 'msg':
         log('Type /msg [user] [text] to send a private message to a user.');
+        break;
+      case 'part':
+        log('Type /part [channel] to leave a channel.');
+        log('To leave multiple channels, type /part [channel1] [channel2] [channel3]');
+        log('To leave current channel, type /part with no arguments.');
         break;
       case 'query':
         log('Type /query [user] to begin a private chat with a user.');
@@ -508,6 +538,9 @@ $(function() {
     }
     if (options.type == 'private'){
       $el.css('font-style', 'italic');
+    }
+    if ('error' in options){
+      $el.css('color', 'red');
     }
     
     $messages[0].scrollTop = $messages[0].scrollHeight;

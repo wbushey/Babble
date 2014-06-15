@@ -50,7 +50,7 @@ Clients.prototype.name = function(new_name){
  */
 Clients.prototype.client_names = function(){
   return this._client_names;
-}
+};
 
 /**
  * Adds a new client to the room.
@@ -131,7 +131,7 @@ Clients.prototype.contains = function(subset){
  * @return {Number} Number of Client objects in the room
  */
 Clients.prototype.size = function(){
-  return this._clients.filter(function(v){return v !== undefined}).length;
+  return this._clients.filter(function(v){return v !== undefined;}).length;
 };
  
 /**
@@ -159,11 +159,13 @@ Clients.prototype.size = function(){
  *                                  broadcast to
  * @param {String[]} [output_media] If provided, this will override the 
  *                                  output_media of the clients for this
- *                                  broadcast
+ *                             sendM     broadcast
  */
 Clients.prototype.broadcast = function(params){
   if (params.ignore_clients === undefined)
     params.ignore_clients = [];
+  if (params.channel === undefined)
+    params.channel = 'public';
   var valid_session = (params.magic == magic);
   if  (!valid_session) {
     for (var i in this._clients) {
@@ -180,7 +182,8 @@ Clients.prototype.broadcast = function(params){
       msg: params.msg,
       from_lang: params.from_lang,
       output_media: params.output_media,
-      session: params.session
+      session: params.session,
+      channel: params.channel
   };
   
   if (!valid_session){
@@ -188,9 +191,11 @@ Clients.prototype.broadcast = function(params){
     return;
   }
   
-  this._clients.filter(function(v){return v !== undefined}).forEach(function(client){
+  this._clients.filter(function(v){return v !== undefined;}).forEach(function(client){
     if (params.ignore_clients.indexOf(client) === -1){
-      client.emit(emit_params); 
+      if (client.channels().indexOf(params.channel) != -1) {
+        client.emit(emit_params);
+      }
     }
   });
 };

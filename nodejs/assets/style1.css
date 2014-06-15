@@ -23,6 +23,11 @@ html, body {
   padding: 0;
 }
 
+body {
+background-image:url('pics/swirl.png');
+background-color:#ffffff;
+}
+
 ul {
   list-style: none;
 }

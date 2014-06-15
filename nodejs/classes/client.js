@@ -19,6 +19,7 @@ var Client = function(params){
   this._output_media = [];
   this._socket = null;
   this._session = "";
+  this._channels = ['public'];
 
   if (params !== undefined){
     this.name(params.name);
@@ -223,9 +224,41 @@ Client.prototype.emit = function(params){
   // an option on what the client *receives*.
   fetch_options.medium = 'text';
   fetchTranslation(fetch_options);
+};
 
+/**
+ * Access and modify the Client's channel list. If called without
+ * an argument, it will return the Client's current channel list.
+ * If called with an argument, it will set the Client's channel list
+ * to the provided list, and return the newly set channel list.
+ *
+ * @method channels
+ * @param {Object} new_channels A new channel list.
+ * @returns {String} The Client's channel list.
+ */
+Client.prototype.channels = function(new_channels){
+  if(new_channels !== undefined)
+    this._channels = new_channels;
 
-// At some point this should call fetchTranslation from ../utils/*-fetchTranslation
+  return this._channels;
+};
+
+Client.prototype.join_channel = function(channel){
+  var idx = this._channels.indexOf(channel);
+  if (idx == -1) {
+    this._channels.push(channel);
+  }
+};
+
+Client.prototype.part_channel = function(channel){
+  var idx = this._channels.indexOf(channel);
+  if (idx != -1) {
+    delete this._channels[idx];
+  }
+};
+
+Client.prototype.find_channel = function(channel){
+  return this._channels.indexOf(channel);
 };
 
 module.exports = Client;

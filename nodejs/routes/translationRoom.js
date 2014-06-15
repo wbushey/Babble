@@ -62,7 +62,8 @@ function create(server){
         msg: data.msg,
         from_lang: speaking_client.from_lang(),
         ignore_clients: [speaking_client],
-        session: speaking_client.session()
+        session: speaking_client.session(),
+        channel: data.channel
       };
       io.clients.broadcast(broadcast_params);
     });
@@ -73,7 +74,6 @@ function create(server){
      * @event disconnect
      */
     socket.on('disconnect', function(data){
-      console.log('disconnect received');
       if (socket.translation_client){
         var broadcast_params = {
           action: 'leave',
@@ -97,7 +97,7 @@ function create(server){
     socket.on('client names', function(data){
       var client = socket.translation_client;
       if (client){
-        var client_names = '' + io.clients.client_names().filter(function(x){return x;});
+        var client_names = '' + io.clients.client_names().filter(function(x){return (x !== undefined);});
         client.socket().emit('client names', client_names);
       }
     });
@@ -108,32 +108,62 @@ function create(server){
         console.log('No speaking client');
         return;
       }
-      var idx = io.clients.client_names().indexOf(data.to);
-        
-      if (idx == -1) {
-        console.log('Recipient not found');
-        return;
-      }
-      var receiving_client = io.clients._clients[idx];
-        
+      
       if (data.session != speaking_client.session()) {
         console.log('Invalid session ID');
         return;
       }
+      
+      var seen = {};
+      seen[speaking_client.name()] = true;
+      
+      data.to.split(',').forEach(function(recipient) {
+        if ((recipient === undefined) || (recipient in seen))
+          return;
+        var idx = io.clients.client_names().indexOf(recipient);
+        if (idx == -1) {
+          console.log('Recipient not found');
+          return;
+        }
+        seen[recipient] = true;
+        var receiving_client = io.clients._clients[idx];
         
-      var emit_params = {
-        action: 'private message',
-        from_name: speaking_client.name(),
-        msg: data.msg,
-        from_lang: speaking_client.from_lang(),
-        output_media: speaking_client.output_media(),
-        session: receiving_client.session()
-      };
+        var emit_params = {
+          action: 'private message',
+          from_name: speaking_client.name(),
+          msg: data.msg,
+          from_lang: speaking_client.from_lang(),
+          session: receiving_client.session()
+        };
         
-      receiving_client.emit(emit_params);
+        receiving_client.emit(emit_params);
+      });
     });
-  });
+    
+    socket.on('join channels', function(data) {
+      var speaking_client = socket.translation_client;
+      if (!speaking_client) {
+        console.log('No speaking client');
+        return;
+      }
+      data.channels.split(',').forEach(function(channel){
+        speaking_client.join_channel(channel);
+      });
+    });
+    
+    socket.on('part', function(data) {
+      var speaking_client = socket.translation_client;
+      if (!speaking_client) {
+        console.log('No speaking client');
+        return;
+      }
+      data.channels.split(',').forEach(function(channel){
+        speaking_client.part_channel(channel);
+      });
+    });
 
+  });
+                      
   return io;
 }
 
