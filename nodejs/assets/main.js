@@ -103,7 +103,6 @@ $(function() {
   var username_regex = /^[a-zA-Z0-9_]*$/;
   var msg_regex = /^\/msg\s(\S+?)\s(.+)/;
   var match_obj;
-  var client_names;
   var ignore_list = [];
   var query_list = [];
   var channel = 'public';
@@ -208,7 +207,6 @@ $(function() {
       var other_user = data.orig_text.split(' ')[0];
       if (other_user != username) {
         log(data.text);
-        client_names.push(other_user);
       }
     });
 
@@ -217,10 +215,6 @@ $(function() {
       data = JSON.parse(data);
       var other_user = data.orig_text.split(' ')[0];
       log(data.text);
-      var idx = client_names.indexOf(other_user);
-      if (idx != -1){
-        delete client_names[idx]; 
-      }
     });
   
     socket.on('refused', function (data) {
@@ -228,9 +222,9 @@ $(function() {
       log('Type /quit or reload the page');
     });
   
-    // Whenever the server emits 'client names', save the list in client_names
-    socket.on('client names', function (data) {
-      client_names = data.split(',');   
+    // Whenever the server emits 'names', log it in the chat window
+    socket.on('names', function (data) {
+      log('Users: ' + data.join(', '));   
     });
 
     // Whenever the server emits 'error', log it in the chat body
@@ -253,7 +247,7 @@ $(function() {
                        output_media: media};
     
     socket.emit('join', join_params);
-    listUsers();
+    listNames();
   }
   
   // User Commands
@@ -261,16 +255,8 @@ $(function() {
     var tokens = msg.split(' ');
     var i;
     switch (tokens[0]) {
-      case '/quit':
-        restart();
-        break;
-      case '/users':
-        listUsers();
-        break;
-      case '/msg':
-        var recipient = tokens[1];
-        var message = tokens.slice(2).join(' ');
-        sendPrivateMessage(recipient, message);
+      case '/help':
+        help(tokens[1]);
         break;
       case '/ignore':
         ignoreUsers(tokens.slice(1));
@@ -278,8 +264,16 @@ $(function() {
       case '/join':
         joinChannels(tokens.slice(1));
         break;
-      case '/unignore':
-        unignoreUsers(tokens.slice(1));
+      case '/msg':
+        var recipient = tokens[1];
+        var message = tokens.slice(2).join(' ');
+        sendPrivateMessage(recipient, message);
+        break;
+      case '/names':
+        listNames(tokens[1]);
+        break;
+      case '/part':
+        partChannels(tokens.slice(1));
         break;
       case '/query':
         query_list = tokens.slice(1);
@@ -289,9 +283,13 @@ $(function() {
           log('Public chat');
         }
         break;
-      case '/help':
-        help(tokens[1]);
+      case '/quit':
+        restart();
         break;
+      case '/unignore':
+        unignoreUsers(tokens.slice(1));
+        break;
+      
       default:
         help();
     }
@@ -304,9 +302,11 @@ $(function() {
   }
 
   // Retrieve client list and log it in the chat body
-  function listUsers() {
-    socket.emit('client names');
-    setTimeout(function() {return log('Users: ' + client_names.join(' '));}, 250);
+  function listNames(chan) {
+    if (chan === undefined) {
+      chan = channel;
+    }
+    socket.emit('names', chan);
   }
   
   // Ignore users
@@ -363,14 +363,20 @@ $(function() {
       } else {
         log('Joining channels ' + channels.join(', '));
       }
+      listNames();
     }
   }
   
   // Part channels
   function partChannels(channels){
     if (channels.length === 0)
-      channels = 'channel';
+      channels = [channel];
     socket.emit('part', {channels: '' + channels});
+    if (channels.length == 1) {
+      log('Leaving channel ' + channels);
+    } else {
+      log('Leaving channels ' + channels.join(', '));
+    }
   }
     
   // Send a chat message
@@ -419,7 +425,7 @@ $(function() {
     switch (cmd) {
       case 'help':
         log('Type /help [cmd] to get help on a specific command.');
-        log('Commands: help, ignore, joim, msg, part, query, quit, unignore, users');
+        log('Commands: help, ignore, joim, msg, names, part, query, quit, unignore');
         break;
       case 'ignore':
         log('Type /ignore [user] to ignore all messages from a user.');
@@ -450,8 +456,9 @@ $(function() {
         log('To remove multiple users, type /ignore [user1] [user2] [user3]');
         log('To remove all users, type /ignore with no arguments.');
         break;
-      case 'users':
-        log('Type /users to display the list of users.');
+      case 'names':
+        log('Type /names [channel] to list the users in a channel.');
+        log('Type /names to list the names in the current channel.');
         break;
       default:
         help();

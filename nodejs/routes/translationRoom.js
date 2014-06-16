@@ -92,13 +92,24 @@ function create(server){
     /**
      * Action issued when a client requests the list of client names.
      *
-     * @event client names
+     * @event names
      */
-    socket.on('client names', function(data){
+    socket.on('names', function(channel){
+      console.log('names ' + channel);
+      if (typeof channel !== 'string'){
+        console.log('Parameter for names action should be a string.');
+        return;
+      }
       var client = socket.translation_client;
       if (client){
-        var client_names = '' + io.clients.client_names().filter(function(x){return (x !== undefined);});
-        client.socket().emit('client names', client_names);
+        var client_names = [];
+        io.clients._clients.forEach(function(cl) {
+          if (cl.channels().indexOf(channel) != -1) {
+            client_names.push(cl.name());
+          }
+        });
+        client.socket().emit('names', client_names);
+        console.log('found names: ' + client_names);
       }
     });
     
