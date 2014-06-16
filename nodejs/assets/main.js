@@ -223,11 +223,6 @@ $(function() {
       log(data.text);
     });
   
-    socket.on('refused', function (data) {
-      log('Nickname in use. Please choose another.');
-      log('Type /quit or reload the page');
-    });
-  
     // Whenever the server emits 'names', log it in the chat window
     socket.on('names', function (data) {
       log('Users: ' + data.join(', '));   
@@ -465,7 +460,7 @@ $(function() {
         log('Type /audio to toggle audio (on or off).');
       case 'help':
         log('Type /help [cmd] to get help on a specific command.');
-        log('Commands: help, ignore, join, msg, names, part, query, quit, unignore');
+        log('Commands: audio, help, ignore, join, msg, names, part, query, quit, unignore');
         break;
       case 'ignore':
         log('Type /ignore [user] to ignore all messages from a user.');
@@ -496,6 +491,9 @@ $(function() {
         log('To remove multiple users, type /ignore [user1] [user2] [user3]');
         log('To remove all users, type /ignore with no arguments.');
         break;
+      case 'n':
+      case 'who':
+      case 'users':
       case 'names':
         log('Type /names [channel] to list the users in a channel.');
         log('Type /names to list the names in the current channel.');

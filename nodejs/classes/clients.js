@@ -68,8 +68,7 @@ Clients.prototype.insert = function(new_client){
 
   if (this._client_names.indexOf(new_client.name()) !== -1){
    
-    new_client.emit({action: 'refused'});
-    
+    new_client.socket().emit('err', 'Nickname in use. Please choose another. Type /quit or reload the page.\n');
     // throw new Error("Client " + new_client.name() + " already in list.");
   } else {
     this._clients.push(new_client);
