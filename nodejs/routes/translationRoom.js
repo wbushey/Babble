@@ -27,6 +27,13 @@ function create(server){
 
       data.socket = socket;
       var new_client = new Client(data);
+      
+      var username_regex = /^[a-zA-Z0-9_]{1,14}$/;
+      if (!data.name.match(username_regex)) {
+        new_client.socket().emit('err', 'Invalid username');
+        console.log('Invalid username');
+        return;
+      }
       socket.translation_client = new_client;
       io.clients.insert(new_client);
 

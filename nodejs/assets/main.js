@@ -1,7 +1,8 @@
 $(function() {
-  var timeOut = null;
+  var timeOut = null; // timeout ID
+  var AUTOSEND_TIME = 1000; // Time (in ms) until text is sent to the server after speech recognition has occurred.
   var FADE_TIME = 150; // ms
-  var COLORS = [
+  var COLORS = [ // Colors used for nicknames
     '#e21400', '#91580f', '#f8a700', '#f78b00',
     '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
@@ -93,20 +94,22 @@ $(function() {
       ['日本語 (Japanese)', 'ja', true, 'ja-JP']];
  
   // Initialize varibles
-  var sessionID;
+  var sessionID; // to prevent spoofing
   var $window = $(window);
   var $usernameInput = $('#username'); // Input for username
-  var $languageDropdown = $('#language_select');
+  var $languageDropdown = $('#language_select'); //Dropdown menu to select language
   var $messages = $('.messages'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
   var socket = io();
   var media;
-  var username_regex = /^[a-zA-Z0-9_]*$/;
+  var username_regex = /^[a-zA-Z0-9_]{1,14}$/;
   var msg_regex = /^\/msg\s(\S+?)\s(.+)/;
   var match_obj;
   var ignore_list = [];
   var query_list = [];
   var channel = 'public';
+  var allow_audio = false;
+  var audio_on = false;
   
   // Speech recognition stuff
   var $microphone = $('.microphone'); // Microphone for audio input
@@ -173,6 +176,7 @@ $(function() {
       media = ['text'];
       if (langs[language_index][2]) {
         media = ['text', 'audio'];
+        allow_audio = true;
       }
       dialect = langs[language_index][3];
       if (typeof dialect == 'object'){
@@ -183,6 +187,7 @@ $(function() {
         $microphone.hide();
       } else {
         createRecognition();
+        
       }
       connect();
     }
@@ -229,7 +234,8 @@ $(function() {
     });
 
     // Whenever the server emits 'error', log it in the chat body
-    socket.on('error', function (data) {
+    socket.on('err', function (data) {
+      console.log('Received error: ' + data);
       log('Error: ' + data, {error: true});
     });
     
@@ -256,6 +262,10 @@ $(function() {
     var tokens = msg.split(' ');
     var i;
     switch (tokens[0]) {
+      case '/a':
+      case '/audio':
+        toggleAudio();
+        break;
       case '/h':
       case '/help':
         help(tokens[1]);
@@ -354,6 +364,24 @@ $(function() {
     }
   }
   
+  function toggleAudio() {
+    if (!allow_audio) {
+      log('Your language does not support audio.');
+    } else {
+      if (audio_on) {
+        media = ['text'];
+        log('Audio is now OFF');
+        $player.hide();
+        audio_on = false;
+      } else {
+        media = ['text', 'audio'];
+        log('Audio is now ON');
+        $player.show();
+        audio_on = true;
+      }
+    }
+  }
+        
   // Send a private message
   function sendPrivateMessage(recipients, message){
     addChatMessage({from_name: username, text: message}, {type: 'private'});
@@ -433,6 +461,8 @@ $(function() {
       cmd = cmd.substr(1);
     
     switch (cmd) {
+      case 'audio':
+        log('Type /audio to toggle audio (on or off).');
       case 'help':
         log('Type /help [cmd] to get help on a specific command.');
         log('Commands: help, ignore, join, msg, names, part, query, quit, unignore');
