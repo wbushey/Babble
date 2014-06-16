@@ -20,6 +20,7 @@ var Client = function(params){
   this._socket = null;
   this._session = "";
   this._channels = ['public'];
+  this._ignore = [];
 
   if (params !== undefined){
     this.name(params.name);
@@ -244,21 +245,35 @@ Client.prototype.channels = function(new_channels){
 };
 
 Client.prototype.join_channel = function(channel){
-  var idx = this._channels.indexOf(channel);
-  if (idx == -1) {
+  if (this._channels.indexOf(channel) == -1)
     this._channels.push(channel);
-  }
 };
 
 Client.prototype.part_channel = function(channel){
   var idx = this._channels.indexOf(channel);
-  if (idx != -1) {
+  if (idx != -1)
     delete this._channels[idx];
-  }
 };
 
 Client.prototype.find_channel = function(channel){
   return this._channels.indexOf(channel);
+};
+
+Client.prototype.ignore = function(new_ignore){
+  if (new_ignore !== undefined)
+    this._ignore = new_ignore;
+  return this._ignore;
+};
+
+Client.prototype.add_ignore = function(name){
+  if (this._ignore.indexOf(name) == -1)
+    this._ignore.push(name);
+};
+
+Client.prototype.remove_ignore = function(name){
+  var idx = this._ignore.indexOf(name);
+  if (idx != -1)
+    delete this._ignore[idx];
 };
 
 module.exports = Client;

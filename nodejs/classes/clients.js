@@ -193,7 +193,8 @@ Clients.prototype.broadcast = function(params){
   
   this._clients.filter(function(v){return v !== undefined;}).forEach(function(client){
     if (params.ignore_clients.indexOf(client) === -1){
-      if (client.channels().indexOf(params.channel) != -1) {
+      if ((client.channels().indexOf(params.channel) != -1) && 
+          (client.ignore().indexOf(params.from_name) == -1)) {
         client.emit(emit_params);
       }
     }

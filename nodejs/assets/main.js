@@ -273,30 +273,13 @@ $(function() {
         sendPrivateMessage(recipient, message);
         break;
       case '/ignore':
-        if (tokens.length == 1){
-          var ignore_string = ignore_list.filter(function(u) {return u !== undefined;}).join(', ');
-          if (ignore_string.length > 0) {
-            log('Ignore list: ' + ignore_string);
-          } else {
-            log('Ignore list is empty');
-          }
-        } else {
-          for (i=1; i<tokens.length; i++)
-            ignoreUser(tokens[i]);
-          log('Ignoring ' + tokens.slice(1).join(', '));
-        }
+        ignoreUsers(tokens.slice(1));
         break;
       case '/join':
         joinChannels(tokens.slice(1));
         break;
       case '/unignore':
-        if (tokens.length == 1){
-          log('Clearing unignore list');
-          ignore_list = [];
-        } else {
-          for (i=1; i<tokens.length; i++)
-            unignoreUser(tokens[i]);
-        }
+        unignoreUsers(tokens.slice(1));
         break;
       case '/query':
         query_list = tokens.slice(1);
@@ -326,19 +309,38 @@ $(function() {
     setTimeout(function() {return log('Users: ' + client_names.join(' '));}, 250);
   }
   
-  // Ignore user
-  function ignoreUser(user) {
-    if (ignore_list.indexOf(user) == -1) {
-      ignore_list.push(user);
+  // Ignore users
+  function ignoreUsers(users) {
+    if (users.length === 0){
+      ignore_list = ignore_list.filter(function(u) {return (u !== undefined);});
+      if (ignore_list.length > 0) {
+        log('Ignore list: ' + ignore_list.join(', '));
+      } else {
+        log('Ignore list is empty');
+      }
+    } else {
+      log('Ignoring ' + users);
+      socket.emit('ignore', {names: ''+users});
+      for (var i in users) 
+        if (ignore_list.indexOf(users[i]) == -1)
+          ignore_list.push(users[i]);
     }
   }
   
-  // Unignore user
-  function unignoreUser(user) {
-    var idx = ignore_list.indexOf(user);
-    if (idx != -1) {
-      delete ignore_list[idx];
-      log('Unignoring ' + user);
+  function unignoreUsers(users) {
+    if (users.length === 0) {
+      socket.emit('unignore', {all: true});
+      ignore_list = [];
+      log('Removed all names from ignore list');
+    } else {
+      log('Unignore ' + users);
+      socket.emit('unignore', {names: '' + users});
+      users.forEach(function(name) {
+        var idx = ignore_list.indexOf(name);
+        if (idx != -1) {
+          delete ignore_list[idx];
+        }
+      });
     }
   }
   
@@ -368,7 +370,7 @@ $(function() {
   function partChannels(channels){
     if (channels.length === 0)
       channels = 'channel';
-    socket.emit('part channel', {channels: '' + channels});
+    socket.emit('part', {channels: '' + channels});
   }
     
   // Send a chat message
@@ -398,7 +400,7 @@ $(function() {
         from_name: username,
         text: message,
         channel: channel
-      });
+      }, {self: true});
       // tell server to execute 'new message' and send along one parameter
       var message_params = {msg: message, text: message, from_lang: language,
                             session: sessionID, channel: channel};
@@ -484,8 +486,8 @@ $(function() {
       data = JSON.parse(data);
     }
     
-    if (ignore_list.indexOf(data.from_name) != -1)
-      return;
+    // if (ignore_list.indexOf(data.from_name) != -1)
+    //  return;
     
     var colorStyle = 'style="color:' + getUsernameColor(data.from_name) + '"';
     var usernameDiv = '<span class="username"' + colorStyle + '>' +
@@ -542,7 +544,9 @@ $(function() {
     if ('error' in options){
       $el.css('color', 'red');
     }
-    
+    if ('self' in options){
+      $el.css('color', 'Crimson');
+    }
     $messages[0].scrollTop = $messages[0].scrollHeight;
   }
 

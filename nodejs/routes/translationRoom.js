@@ -103,6 +103,9 @@ function create(server){
     });
     
     socket.on('private message', function(data){
+      if (typeof data === 'string')
+        data = JSON.parse(data);
+      
       var speaking_client = socket.translation_client;
       if (!speaking_client) {
         console.log('No speaking client');
@@ -111,6 +114,11 @@ function create(server){
       
       if (data.session != speaking_client.session()) {
         console.log('Invalid session ID');
+        return;
+      }
+      
+      if (typeof data.to !== 'string') {
+        console.log('Missing or invalid recipients list.');
         return;
       }
       
@@ -127,6 +135,10 @@ function create(server){
         }
         seen[recipient] = true;
         var receiving_client = io.clients._clients[idx];
+        if (receiving_client.ignore().indexOf(speaking_client.name()) != -1) {
+          console.log('Sender ignored by recipient.');
+          return;
+        }
         
         var emit_params = {
           action: 'private message',
@@ -141,9 +153,16 @@ function create(server){
     });
     
     socket.on('join channels', function(data) {
+      if (typeof data === 'string')
+        data = JSON.parse(data);
+
       var speaking_client = socket.translation_client;
       if (!speaking_client) {
         console.log('No speaking client');
+        return;
+      }
+      if (typeof data.channels !== 'string') {
+        console.log('Bad or missing channel list');
         return;
       }
       data.channels.split(',').forEach(function(channel){
@@ -152,6 +171,8 @@ function create(server){
     });
     
     socket.on('part', function(data) {
+      if (typeof data === 'string')
+        data = JSON.parse(data);
       var speaking_client = socket.translation_client;
       if (!speaking_client) {
         console.log('No speaking client');
@@ -161,9 +182,39 @@ function create(server){
         speaking_client.part_channel(channel);
       });
     });
-
+  
+    socket.on('ignore', function(data) {
+      if (typeof data === 'string')
+        data = JSON.parse(data);
+      console.log(JSON.stringify(data));
+      var speaking_client = socket.translation_client;
+      if (!speaking_client) {
+        console.log('No speaking client');
+        return;
+      }
+      data.names.split(',').forEach(function (name) {
+        speaking_client.add_ignore(name);
+      });
+    });
+  
+    socket.on('unignore', function(data) {
+      if (typeof data === 'string')
+        data = JSON.parse(data);
+      var speaking_client = socket.translation_client;
+      if (!speaking_client) {
+        console.log('No speaking client');
+        return;
+      }
+      if ('all' in data) {
+        speaking_client.ignore([]);
+      } else {
+        data.names.split(',').forEach(function (name) {
+          speaking_client.remove_ignore(name);
+        });
+      }
+    });
   });
-                      
+  
   return io;
 }
 
