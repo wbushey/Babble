@@ -194,7 +194,7 @@ $(function() {
 
     // Whenever the server emits 'new message', update the chat body
     socket.on('new message', function (data) {
-      addChatMessage(data);
+      addChatMessage(data, {linkify: true});
     });
 
     // Whenever the server emits 'private message', update the chat body
@@ -416,7 +416,7 @@ $(function() {
         from_name: username,
         text: message,
         channel: channel
-      }, {self: true});
+      }, {self: true, linkify: true});
       // tell server to execute 'new message' and send along one parameter
       var message_params = {msg: message, text: message, from_lang: language,
                             session: sessionID, channel: channel};
@@ -517,7 +517,7 @@ $(function() {
         originalText = '&nbsp;&nbsp;<span class="originalText">' +
                        data.orig_text + '</span>';
     }
-
+    
     var messageDiv = '<li class="message ' + '">' +
         usernameDiv + messageBodyDiv + originalText + '</li>';
     var $messageDiv = $(messageDiv).data('username', data.from_name);
@@ -563,6 +563,16 @@ $(function() {
     }
     if ('self' in options){
       $el.css('color', 'Crimson');
+    }
+    if ('linkify' in options) {
+      $el.attr('data-linkify', 'this');
+      $el.linkify({
+        tagName: 'a',
+        target: '_blank',
+        newLine: '\n',
+        linkClass: null,
+        linkAttributes: null
+      });
     }
     $messages[0].scrollTop = $messages[0].scrollHeight;
   }
