@@ -255,26 +255,33 @@ $(function() {
     var tokens = msg.split(' ');
     var i;
     switch (tokens[0]) {
+      case '/h':
       case '/help':
         help(tokens[1]);
         break;
+      case '/i':
       case '/ignore':
         ignoreUsers(tokens.slice(1));
         break;
+      case '/j':
       case '/join':
         joinChannels(tokens.slice(1));
         break;
+      case '/m':
       case '/msg':
         var recipient = tokens[1];
         var message = tokens.slice(2).join(' ');
         sendPrivateMessage(recipient, message);
         break;
+      case '/n':
       case '/names':
         listNames(tokens[1]);
         break;
+      case '/p':
       case '/part':
         partChannels(tokens.slice(1));
         break;
+      case '/q':
       case '/query':
         query_list = tokens.slice(1);
         if (query_list.length > 0) {
@@ -283,9 +290,11 @@ $(function() {
           log('Public chat');
         }
         break;
+      case '/x':
       case '/quit':
         restart();
         break;
+      case '/u':
       case '/unignore':
         unignoreUsers(tokens.slice(1));
         break;
