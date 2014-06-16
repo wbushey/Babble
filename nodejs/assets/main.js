@@ -419,7 +419,7 @@ $(function() {
     switch (cmd) {
       case 'help':
         log('Type /help [cmd] to get help on a specific command.');
-        log('Commands: help, ignore, msg, query, quit, unignore, users');
+        log('Commands: help, ignore, joim, msg, part, query, quit, unignore, users');
         break;
       case 'ignore':
         log('Type /ignore [user] to ignore all messages from a user.');
