@@ -85,10 +85,10 @@ $(function() {
       ['български (Bulgarian)', 'bg', false, 'bg-BG'],
       ['Pусский (Russian)', 'ru', true, 'ru-RU'],
       ['한국어 (Korean)', 'ko', true, 'ko-KR'],
-      ['Chinese Simplified', 'zh-CHS', true, [
+      ['简化字 (Chinese Simplified)', 'zh-CHS', true, [
           ['cmn-Hans-CN', '普通话 (中国大陆)'],
           ['cmn-Hans-HK', '普通话 (香港)']]],
-      ['Chinese Traditional', 'zh-CHT', true, [
+      ['正體字 (Chinese Traditional)', 'zh-CHT', true, [
           ['cmn-Hant-TW', '中文 (台灣)'],
           ['yue-Hant-HK', '粵語 (香港)']]],
       ['日本語 (Japanese)', 'ja', true, 'ja-JP']];
