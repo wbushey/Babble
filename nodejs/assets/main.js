@@ -458,6 +458,7 @@ $(function() {
     switch (cmd) {
       case 'audio':
         log('Type /audio to toggle audio (on or off).');
+        break;
       case 'help':
         log('Type /help [cmd] to get help on a specific command.');
         log('Commands: audio, help, ignore, join, msg, names, part, query, quit, unignore');
@@ -535,8 +536,11 @@ $(function() {
     //  return;
     
     var colorStyle = 'style="color:' + getUsernameColor(data.from_name) + '"';
+    var channelLabel = '';
+    if (data.channel !== 'undefined' && data.channel !== 'public')
+      channelLabel  = ' (' + data.channel + ')';
     var usernameDiv = '<span class="username"' + colorStyle + '>' +
-      cleanInput(data.from_name) + '</span>';
+      cleanInput(data.from_name) + channelLabel + '</span>';
     var text = cleanInput(data.text);
     var messageBodyDiv = '<span class="messageBody">' + text + '</span>';
     
@@ -603,6 +607,7 @@ $(function() {
       });
     }
     $messages[0].scrollTop = $messages[0].scrollHeight;
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
   }
 
   // Prevents input from having injected markup
