@@ -189,6 +189,7 @@ Client.prototype.emit = function(params){
       }
       return_obj.message_id = (new Date()).valueOf();
       return_obj.orig_text = params.msg;
+      return_obj.channel = params.channel;
       if (parsed.hasOwnProperty('string')){
         if (output_media.indexOf('text') !== -1)
           return_obj.text = parsed.string._;

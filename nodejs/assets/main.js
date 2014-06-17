@@ -177,6 +177,7 @@ $(function() {
       if (langs[language_index][2]) {
         media = ['text', 'audio'];
         allow_audio = true;
+        audio_on = true;
       }
       dialect = langs[language_index][3];
       if (typeof dialect == 'object'){
@@ -374,6 +375,7 @@ $(function() {
         $player.show();
         audio_on = true;
       }
+      socket.emit('media', JSON.stringify(media));
     }
   }
         
@@ -537,7 +539,7 @@ $(function() {
     
     var colorStyle = 'style="color:' + getUsernameColor(data.from_name) + '"';
     var channelLabel = '';
-    if (data.channel !== 'undefined' && data.channel !== 'public')
+    if ((typeof data.channel !== 'undefined') && (data.channel !== 'public'))
       channelLabel  = ' (' + data.channel + ')';
     var usernameDiv = '<span class="username"' + colorStyle + '>' +
       cleanInput(data.from_name) + channelLabel + '</span>';

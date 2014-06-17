@@ -231,7 +231,20 @@ function create(server){
         });
       }
     });
+    
+    socket.on('media', function(data) {
+      if (typeof data === 'string')
+        data = JSON.parse(data);
+      var speaking_client = socket.translation_client;
+      if (!speaking_client) {
+        console.log('No speaking client');
+        return;
+      }
+      speaking_client.output_media(data);
+    });
+  
   });
+  
   
   return io;
 }
