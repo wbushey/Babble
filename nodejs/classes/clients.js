@@ -123,6 +123,13 @@ Clients.prototype.contains = function(subset){
   }
 };
 
+Clients.prototype.find_name = function(name) {
+  for (var i = 0; i < this._clients.length; i++)
+    if (this._clients[i] && this._clients[i].name() == name)
+      return i;
+  return -1;
+};
+
 /**
  * Returns the size of the room - the number of Client objects in the room.
  *

@@ -159,7 +159,6 @@ $(function() {
       }
    }
   
-
   // Sets the client's username
   function setUsername () {
     username = cleanInput($usernameInput.val().trim());
@@ -301,6 +300,9 @@ $(function() {
       case '/quit':
         restart();
         break;
+      case '/set':
+        userSettings(tokens.slice(1));
+        break;
       case '/u':
       case '/unignore':
         unignoreUsers(tokens.slice(1));
@@ -377,6 +379,19 @@ $(function() {
       }
       socket.emit('media', JSON.stringify(media));
     }
+  }
+  
+  function userSettings(params) {
+    if (params.length === 0){
+      displayUserSettings();
+    } else {
+      emit_params = {};
+      emit_params[params[0]] = params[1];
+      socket.emit('settings', emit_params);
+    }
+  }
+
+  function displayUserSettings(params) {
   }
         
   // Send a private message
@@ -500,6 +515,9 @@ $(function() {
       case 'names':
         log('Type /names [channel] to list the users in a channel.');
         log('Type /names to list the names in the current channel.');
+        break;
+      case 'set':
+        log('/set changes user settings.');
         break;
       default:
         help();

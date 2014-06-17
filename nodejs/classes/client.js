@@ -1,5 +1,7 @@
 var parseString = require('xml2js').parseString;
 var fetchTranslation = require('../utils/microsoft-fetchTranslation');
+
+var username_regex = /^[a-zA-Z0-9_]{1,14}$/;
 /** 
  * @module Client 
  * @namespace 
@@ -42,9 +44,13 @@ var Client = function(params){
  * @returns {String} The Client's name
  */
 Client.prototype.name = function(new_name){
-  if (new_name !== undefined)
-    this._name = new_name;
-
+  if (new_name !== undefined) {
+    if (new_name.match(username_regex)) {
+      this._name = new_name;
+    } else {
+      this.socket().emit('err', 'Invalid nickname');
+    }
+  }
   return this._name;
 };
 
@@ -78,6 +84,7 @@ Client.prototype.from_lang = function(new_from_lang){
                                to for the client
  * @returns {String} The Client's language to translate to
  */
+
 Client.prototype.to_lang = function(new_to_lang){
   if(new_to_lang !== undefined)
     this._to_lang = new_to_lang;
@@ -178,9 +185,10 @@ Client.prototype.emit = function(params){
 
   // Set the callbacks
   var fetched = "";
-  var on_data = function(chunk){
+  var on_data = function(chunk) {
     fetched += chunk.toString();
   };
+  
   var on_end = function(data){
     parseString(fetched, function(err, parsed){
       var return_obj = {};
@@ -246,8 +254,12 @@ Client.prototype.channels = function(new_channels){
 };
 
 Client.prototype.join_channel = function(channel){
-  if (this._channels.indexOf(channel) == -1)
-    this._channels.push(channel);
+  if (channel.match(username_regex)) {
+    if (this._channels.indexOf(channel) == -1)
+      this._channels.push(channel);
+  } else {
+    this.socket().emit('err', 'Invalid channel name');
+  }
 };
 
 Client.prototype.part_channel = function(channel){

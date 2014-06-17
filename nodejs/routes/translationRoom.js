@@ -4,6 +4,8 @@ var Clients = require('../classes/clients');
 var Client = require('../classes/client');
 var secrets = require('../utils/getSecrets.js');
 var magic = secrets.getSecret('magic');
+var username_regex = /^[a-zA-Z0-9_]{1,14}$/;
+var lang_regex = /^[a-zA-Z\-]{2,8}$/;
 
 function create(server){
   var io = new SocketIO(server);
@@ -28,7 +30,6 @@ function create(server){
       data.socket = socket;
       var new_client = new Client(data);
       
-      var username_regex = /^[a-zA-Z0-9_]{1,14}$/;
       if (!data.name.match(username_regex)) {
         new_client.socket().emit('err', 'Invalid username');
         console.log('Invalid username');
@@ -243,6 +244,37 @@ function create(server){
       speaking_client.output_media(data);
     });
   
+    socket.on('settings', function(data) {
+      if (typeof data == 'string')
+        data = JSON.parse(data);
+      var speaking_client = socket.translation_client;
+      if (!speaking_client) {
+        console.log('No speaking client');
+        return;
+      }
+      
+      if ('name' in data)
+        if (io.clients.find_name(data.name) == -1) {
+          speaking_client.name(data.name);
+        } else {
+          speaking_client.socket().emit('err', 'Nickname already exists.');
+        }
+      
+      if ('from_lang' in data) {
+        if ((typeof data.from_lang === 'string') && data.from_lang.match(lang_regex)) {
+          speaking_client.from_lang(data.from_lang);
+        } else {
+          speaking_client.socket().emit('err', 'Invalid language');
+        }
+      }
+      if ('to_lang' in data)
+        if ((typeof data.to_lang === 'string') && data.to_lang.match(lang_regex)) {
+          speaking_client.to_lang(data.to_lang);
+        } else {
+          speaking_client.socket().emit('err', 'Invalid language');
+        }      
+    });  
+          
   });
   
   
