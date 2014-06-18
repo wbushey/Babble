@@ -92,10 +92,11 @@ $(function() {
           ['cmn-Hant-TW', '中文 (台灣)'],
           ['yue-Hant-HK', '粵語 (香港)']]],
       ['日本語 (Japanese)', 'ja', true, 'ja-JP']];
- 
+
   // Initialize varibles
   var sessionID; // to prevent spoofing
   var $window = $(window);
+  $window.focusin(function() {document.title = "Babble Chat Room";});
   var $usernameInput = $('#username'); // Input for username
   var $languageDropdown = $('#language_select'); //Dropdown menu to select language
   var $messages = $('.messages'); // Messages area
@@ -628,6 +629,9 @@ $(function() {
     }
     $messages[0].scrollTop = $messages[0].scrollHeight;
     MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+    if (!document.hasFocus()) {
+      document.title = 'New Messages';
+    }
   }
 
   // Prevents input from having injected markup
