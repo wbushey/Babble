@@ -110,6 +110,9 @@ $(function() {
   var channel = 'public';
   var allow_audio = false;
   var audio_on = false;
+  var chat_history = [];
+  var draft_message;
+  var history_ptr = 0;
   
   // Title bar
   var unread_message_count = 0;
@@ -239,7 +242,6 @@ $(function() {
 
     // Whenever the server emits 'error', log it in the chat body
     socket.on('err', function (data) {
-      console.log('Received error: ' + data);
       log('Error: ' + data, {error: true});
     });
     
@@ -670,13 +672,25 @@ $(function() {
     //  $currentInput.focus();
     // }
     // When the client hits ENTER on their keyboard
-    if (event.which === 13) {
-      if (username && language) {
-        sendMessage();
-      } else {
-        setUsername();
-      }
-    }
+    switch (event.which) {
+        case 13:
+          if (username && language) {
+            var msg = $inputMessage.val();
+            if (msg) {
+              chat_history.push(msg);
+              sendMessage();
+              history_ptr = chat_history.length;
+            }
+          } else {
+            setUsername();
+          }
+          break;
+        case 38:
+          previousMessage();
+          break;
+        case 40:
+          nextMessage();
+    } 
   });
 
   $inputMessage.on('input', function() {
@@ -685,6 +699,30 @@ $(function() {
     }
   });
 
+  function previousMessage() {
+    if (history_ptr > 0) {
+      if (history_ptr == chat_history.length) {
+        draft_message = $inputMessage.val();
+      }
+      history_ptr--;
+      $inputMessage.focus();
+      $inputMessage.val('');
+      $inputMessage.val(chat_history[history_ptr]);
+    }
+  }
+  
+  function nextMessage(){
+    var history_len = chat_history.length;
+    if (history_ptr < history_len) {
+      history_ptr++;
+      $inputMessage.val('');
+      if (history_ptr < history_len) {
+        $inputMessage.val(chat_history[history_ptr]);
+      } else {
+        $inputMessage.val(draft_message);
+      }
+    }
+  }
   
   // Click events
 
