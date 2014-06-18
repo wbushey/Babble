@@ -96,7 +96,6 @@ $(function() {
   // Initialize varibles
   var sessionID; // to prevent spoofing
   var $window = $(window);
-  $window.focusin(function() {document.title = "Babble Chat Room";});
   var $usernameInput = $('#username'); // Input for username
   var $languageDropdown = $('#language_select'); //Dropdown menu to select language
   var $messages = $('.messages'); // Messages area
@@ -111,6 +110,15 @@ $(function() {
   var channel = 'public';
   var allow_audio = false;
   var audio_on = false;
+  
+  // Title bar
+  var unread_message_count = 0;
+  var TITLEBAR = 'Babble Chat Room';
+  document.title = TITLEBAR;
+  $window.focusin(function() {
+    document.title = TITLEBAR;
+    unread_message_count = 0;
+  });
   
   // Speech recognition stuff
   var $microphone = $('.microphone'); // Microphone for audio input
@@ -577,6 +585,11 @@ $(function() {
     
     addMessageElement($messageDiv, options);
     
+    if (!document.hasFocus()) {
+      unread_message_count += 1;
+      document.title = '(' + unread_message_count + ') ' + TITLEBAR;
+    }
+    
     // Insert audio
     if (data.audio && username != data.from_name) {
         getAudio(data);
@@ -629,9 +642,6 @@ $(function() {
     }
     $messages[0].scrollTop = $messages[0].scrollHeight;
     MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
-    if (!document.hasFocus()) {
-      document.title = 'New Messages';
-    }
   }
 
   // Prevents input from having injected markup
