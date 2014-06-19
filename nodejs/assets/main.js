@@ -450,6 +450,10 @@ $(function() {
     
     // if there is a non-empty message and a socket connection
     if (message) {
+      // Add message to history
+      chat_history.push(message);
+      history_ptr = chat_history.length;
+
       // Check for user commands
       if (message.substr(0,1) == '/') {
         userCommands(message);
@@ -675,12 +679,7 @@ $(function() {
     switch (event.which) {
         case 13:
           if (username && language) {
-            var msg = $inputMessage.val();
-            if (msg) {
-              chat_history.push(msg);
-              sendMessage();
-              history_ptr = chat_history.length;
-            }
+            sendMessage();
           } else {
             setUsername();
           }
@@ -705,7 +704,6 @@ $(function() {
         draft_message = $inputMessage.val();
       }
       history_ptr--;
-      $inputMessage.focus();
       $inputMessage.val('');
       $inputMessage.val(chat_history[history_ptr]);
     }
