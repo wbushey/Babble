@@ -272,6 +272,10 @@ $(function() {
       case '/audio':
         toggleAudio();
         break;
+      case '/d':
+      case '/dialect':
+        changeDialect(tokens[1]);
+        break;
       case '/h':
       case '/help':
         help(tokens[1]);
@@ -402,6 +406,14 @@ $(function() {
     }
   }
 
+  function changeDialect(newdialect) {
+    if (newdialect) {
+      dialect = newdialect;
+    } else {
+      log('Current dialect is ' + dialect);
+    }
+  }
+  
   function displayUserSettings(params) {
   }
         
@@ -490,6 +502,10 @@ $(function() {
     switch (cmd) {
       case 'audio':
         log('Type /audio to toggle audio (on or off).');
+        break;
+      case 'dialect':
+        log('Type /dialect [language] to select the dialect for voice recognition.');
+        log('Type /dialect with no arguments to display current dialect.');
         break;
       case 'help':
         log('Type /help [cmd] to get help on a specific command.');
@@ -733,7 +749,13 @@ $(function() {
     if (recognizing) {
        recognition.stop();
     } else {
-       recognition.start();
+       try {
+          recognition.start();
+       }
+       catch(err) {
+         log(err.message, {error:true});
+         recognition.stop();
+       }
     }     
   });
   
@@ -745,7 +767,7 @@ $(function() {
     recognition = new webkitSpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-
+    recognition.lang = dialect;
     recognition.onstart = function() {
       recognizing = true;
       final_transcript = '';
