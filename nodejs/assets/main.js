@@ -583,9 +583,6 @@ $(function() {
       data = JSON.parse(data);
     }
     
-    // if (ignore_list.indexOf(data.from_name) != -1)
-    //  return;
-    
     var colorStyle = 'style="color:' + getUsernameColor(data.from_name) + '"';
     var channelLabel = '';
     if ((typeof data.channel !== 'undefined') && (data.channel !== 'public'))
@@ -693,17 +690,17 @@ $(function() {
     // }
     // When the client hits ENTER on their keyboard
     switch (event.which) {
-        case 13:
+        case 13: // Client hits ENTER
           if (username && language) {
             sendMessage();
           } else {
             setUsername();
           }
           break;
-        case 38:
+        case 38: // Up Arrow
           previousMessage();
           break;
-        case 40:
+        case 40: // Down Arrow
           nextMessage();
     } 
   });
