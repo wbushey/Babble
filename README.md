@@ -108,7 +108,7 @@ Testing
 =======
 
 Tuts+ has a [great article](http://code.tutsplus.com/tutorials/testing-in-nodejs--net-35018)
-on using [Mocha](http://visionmedia.github.io/mocha/) and [Chai](http://chaijs.com/)
+on using [Mocha](http://mochajs.org/) and [Chai](http://chaijs.com/)
 for testing in Node.js, as well as general Test Driven Development in Node.js.
 
 And [here's an article](http://liamkaufman.com/blog/2012/01/28/testing-socketio-with-mocha-should-and-socketio-client/)
